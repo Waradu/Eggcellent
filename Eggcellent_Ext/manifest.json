@@ -23,7 +23,8 @@
   "offline_enabled": true,
   "options_page": "data/pages/options/index.html",
   "commands": {
-    "page": {
+    "open_search_page": {
+      "suggested_key": "Alt+S",
       "description": "Open the Search page"
     }
   }
