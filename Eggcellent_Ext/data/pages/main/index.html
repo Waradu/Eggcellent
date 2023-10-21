@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html class="flat">
+  <head>
+    <title>Search</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link
+      rel="icon"
+      href="../assets/icons/Square512x512.png"
+      type="image/x-icon"
+    />
+  </head>
+  <body>
+    <div class="preserve-position">
+      <div class="search-container">
+        <div class="search-bar">
+          <div class="icon material-symbols-rounded">search</div>
+          <div class="before" id="before"></div>
+          <input
+            type="text"
+            class="input"
+            placeholder="Search"
+            id="search"
+            autocomplete="off"
+          />
+          <div class="send material-symbols-rounded" id="send">send</div>
+        </div>
+        <hr />
+        <div class="search-results" id="results">
+
+        </div>
+
+        <hr />
+
+        <div class="footer">
+          <div class="key">
+            <div class="button material-symbols-rounded" id="au">
+              arrow_upward
+            </div>
+            <div class="button material-symbols-rounded" id="ad">
+              arrow_downward
+            </div>
+            <div class="text">Navigate</div>
+          </div>
+          <div class="key">
+            <div class="button material-symbols-rounded" id="en">shift</div>
+            <div class="button material-symbols-rounded" id="en">
+              keyboard_return
+            </div>
+            <div class="text">Options</div>
+          </div>
+          <div class="rcount" id="rcount">0 Results</div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
