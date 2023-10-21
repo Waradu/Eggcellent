@@ -45,6 +45,7 @@ body {
 
   .search-container {
     background-color: s.$popup-opaque-color;
+    background-size: cover;
     border: s.$popup-border;
     box-shadow: s.$popup-shadow;
     width: 700px;
@@ -250,6 +251,28 @@ body {
         }
       }
     }
+  }
+}
+
+.logo {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 40px;
+  height: 40px;
+  transition: 0.2s;
+  cursor: pointer;
+  background: url("../../assets/icons/512x512_Outlined.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+
+  &:hover {
+    background: url("../../assets/icons/512x512.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    box-shadow: s.$popup-shadow;
   }
 }
 
