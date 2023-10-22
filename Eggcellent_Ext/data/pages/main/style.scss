@@ -271,6 +271,7 @@ body {
 }
 
 .context-menu {
+  user-select: none;
   position: absolute;
   background-color: s.$popup-opaque-color;
   border-radius: 8px;

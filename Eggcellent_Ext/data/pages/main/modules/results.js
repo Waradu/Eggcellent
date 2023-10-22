@@ -107,7 +107,11 @@ export class Results {
     event.preventDefault();
 
     if (this.selectedIndex != -1 && this.resultsCount > 0) {
-      await this.useResult();
+      if (event.shiftKey) {
+        this.showContextMenu();
+      } else {
+        await this.useResult();
+      }
     } else if (this.searchTag.value != "" && this.beforeTag.innerHTML == "") {
       if (this.isURL(document.getElementById("search").value)) {
         window.location = this.formatURL(
@@ -165,6 +169,8 @@ export class Results {
       window.location = result.type == "link" ? result.context : result.desc;
     }
   }
+
+  showContextMenu() {}
 
   async handleSearchKeys(event) {
     if ((event.ctrlKey || event.altKey) && event.key != "Backspace") return;
@@ -358,6 +364,8 @@ export class Results {
   async setResults() {
     this.results = [];
 
+    var action = new menuItemAction();
+
     if (this.searchType == "all" || this.searchType == "tab") {
       var result = await chrome.tabs.query({});
       result = result.filter(
@@ -377,30 +385,57 @@ export class Results {
           tab.id
         );
 
-        this.results.push(tabObj);
-      });
-    }
-
-    if (this.searchType == "all" || this.searchType == "history") {
-      var result = await chrome.history.search({ text: "", maxResults: 50 });
-      result = result.filter(
-        (item) =>
-          !this.patternsToExclude.some((pattern) => item.url.includes(pattern))
-      );
-      result.forEach((history) => {
-        var image = `https://www.google.com/s2/favicons?domain=${history.url}&sz=128`;
-
-        var historyObj = new HistoryResult(
-          history.title,
-          history.url,
-          "history",
-          image,
-          "history",
-          history.url,
-          history.id
+        focusTab = new menuItem(
+          "Focus Tab",
+          "center_focus_strong",
+          "normal",
+          action.focusTab()
         );
+        tabObj.contextMenu.append(focusTab);
 
-        this.results.push(historyObj);
+        openTab = new menuItem(
+          "Open Tab",
+          "open_in_new",
+          "normal",
+          action.openTab()
+        );
+        tabObj.contextMenu.append(openTab);
+
+        reloadTab = new menuItem(
+          "Reload Tab",
+          "refresh",
+          "normal",
+          action.reloadTab()
+        );
+        tabObj.contextMenu.append(reloadTab);
+
+        tabObj.contextMenu.append("separator");
+
+        pinTab = new menuItem(
+          "Pin Tab",
+          "push_pin",
+          "favorite",
+          action.pinTab()
+        );
+        tabObj.contextMenu.append(pinTab);
+
+        copyURL = new menuItem(
+          "Copy URL",
+          "content_copy",
+          "link",
+          action.copyDescToClipboard()
+        );
+        tabObj.contextMenu.append(copyURL);
+
+        closeTab = new menuItem(
+          "Close Tab",
+          "close",
+          "danger",
+          action.closeTab()
+        )
+        tabObj.contextMenu.append(closeTab);
+
+        this.results.push(tabObj);
       });
     }
 
@@ -442,6 +477,29 @@ export class Results {
       );
 
       this.results = this.results.concat(bookmark);
+    }
+
+    if (this.searchType == "all" || this.searchType == "history") {
+      var result = await chrome.history.search({ text: "", maxResults: 50 });
+      result = result.filter(
+        (item) =>
+          !this.patternsToExclude.some((pattern) => item.url.includes(pattern))
+      );
+      result.forEach((history) => {
+        var image = `https://www.google.com/s2/favicons?domain=${history.url}&sz=128`;
+
+        var historyObj = new HistoryResult(
+          history.title,
+          history.url,
+          "history",
+          image,
+          "history",
+          history.url,
+          history.id
+        );
+
+        this.results.push(historyObj);
+      });
     }
 
     this.results.sort((a, b) => {
@@ -496,7 +554,11 @@ export class Results {
           <div class="text">${ele.title}<div class="desc">${
         ele.description
       }</div></div>
-          ${ ele.favorite ? '<div class="qa-icon favorite material-symbols-rounded">star</div>' : "" }
+          ${
+            ele.favorite
+              ? '<div class="qa-icon favorite material-symbols-rounded">star</div>'
+              : ""
+          }
           <div class="qa-icon material-symbols-rounded">${ele.icon}</div>
         </div>
       `;
