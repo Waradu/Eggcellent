@@ -14,6 +14,9 @@
       href="../../assets/icons/512x512.png"
       type="image/x-icon"
     />
+    <script src="./modules/fuse.js"></script>
+    <script src="./modules/math.js"></script>
+    <script type="module" src="./modules/results.js"></script>
   </head>
   <body>
     <div class="preserve-position">
@@ -31,15 +34,7 @@
           <div class="send material-symbols-rounded" id="send">send</div>
         </div>
         <hr />
-        <div class="search-results" id="results">
-
-          <div class="result"></div>
-          <div class="result"></div>
-          <div class="result"></div>
-          <div class="result"></div>
-          <div class="result"></div>
-
-        </div>
+        <div class="search-results" id="results"></div>
 
         <hr />
 
@@ -60,11 +55,44 @@
             </div>
             <div class="text">Options</div>
           </div>
-          <div class="rcount" id="rcount">0 Results</div>
+          <div class="key">
+            <div class="button material-symbols-rounded" id="en">
+              keyboard_return
+            </div>
+            <div class="text">Use</div>
+          </div>
+          <div class="rcount" id="rcount">0/0</div>
+        </div>
+      </div>
+      <div class="context-menu">
+        <div class="menu-item">
+          <div class="menu-item-icon material-symbols-rounded">grid_view</div>
+          <div class="menu-item-text">Test</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-icon material-symbols-rounded">square</div>
+          <div class="menu-item-text">Test2</div>
+        </div>
+        <div class="menu-separator"></div>
+        <div class="menu-item favorite">
+          <div class="menu-item-icon material-symbols-rounded">star</div>
+          <div class="menu-item-text">Favorite</div>
+        </div>
+        <div class="menu-item link">
+          <div class="menu-item-icon material-symbols-rounded">link</div>
+          <div class="menu-item-text">Link</div>
+        </div>
+        <div class="menu-item ok">
+          <div class="menu-item-icon material-symbols-rounded">check</div>
+          <div class="menu-item-text">Ok</div>
+        </div>
+        <div class="menu-item danger">
+          <div class="menu-item-icon material-symbols-rounded">delete</div>
+          <div class="menu-item-text">Fail <div class="key">del</div></div>
         </div>
       </div>
     </div>
     <a href="https://waradu.dev/egg" target="_blank" class="logo"></a>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
   </body>
 </html>
