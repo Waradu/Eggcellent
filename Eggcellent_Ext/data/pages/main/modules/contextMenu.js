@@ -10,11 +10,14 @@ export class contextMenu {
 
 export class menuItem {
   constructor(title, icon, type, action) {
-    this.title = "";
-    this.icon = "";
-    this.type = "";
-    this.action = (item) => {};
-    this.clickable = true;
+    this.title = title;
+    this.icon = icon;
+    this.type = type;
+    this.action = action;
+    this.modifierKey = "del";
+    this.key = "del";
+    this.modifierKeyIcon = false
+    this.keyIcon = false
     this.enabled = true;
     this.closeMenuOnAction = false;
     this.needsConfirmation = false;

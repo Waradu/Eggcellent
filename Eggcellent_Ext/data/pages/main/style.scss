@@ -318,6 +318,9 @@ body {
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      margin-right: 5px;
+      text-wrap: nowrap;
+      white-space: nowrap;
 
       .key {
         align-items: center;
@@ -347,7 +350,7 @@ body {
         font-size: 20px;
       }
 
-      &:hover {
+      &:hover, &.selected {
         background-color: s.$egg-light;
       }
     }
@@ -360,7 +363,7 @@ body {
         font-size: 20px;
       }
 
-      &:hover {
+      &:hover, &.selected {
         background-color: s.$primary-light;
       }
     }
@@ -373,7 +376,7 @@ body {
         font-size: 20px;
       }
 
-      &:hover {
+      &:hover, &.selected {
         background-color: s.$success-light;
       }
     }
@@ -386,12 +389,12 @@ body {
         font-size: 20px;
       }
 
-      &:hover {
+      &:hover, &.selected {
         background-color: s.$danger-light;
       }
     }
 
-    &:hover {
+    &:hover, &.selected {
       background-color: s.$popup-hover-color;
     }
   }

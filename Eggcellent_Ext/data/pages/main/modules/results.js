@@ -12,6 +12,9 @@ export class Results {
 
     this.selectedElement;
 
+    this.inContextMenu = false;
+    this.contextMenuIndex = 0;
+
     this.searchTag = document.getElementById("search");
     this.beforeTag = document.getElementById("before");
     this.resultTag = document.getElementById("results");
@@ -88,15 +91,15 @@ export class Results {
       var result = this.selectedElement;
 
       if (result.type == "history") {
-        chrome.history.deleteUrl({ url: result.desc });
+        chrome.history.deleteUrl({ url: result.description });
       }
 
       if (result.type == "bookmark") {
-        chrome.bookmarks.remove(result.context);
+        chrome.bookmarks.remove(result.ID);
       }
 
       if (result.type == "tab") {
-        chrome.tabs.remove(result.context);
+        chrome.tabs.remove(result.ID);
       }
     }
     await this.search(true, true);
@@ -151,9 +154,9 @@ export class Results {
         focused: true,
       });
 
-      chrome.tabs.update(parseInt(result.context), { active: true });
+      chrome.tabs.update(parseInt(result.ID), { active: true });
 
-      var tab = await chrome.tabs.get(parseInt(result.context));
+      var tab = await chrome.tabs.get(parseInt(result.ID));
 
       for (const tabGroup of tabGroups) {
         if (tabGroup.id === tab.groupId) continue;
@@ -161,16 +164,39 @@ export class Results {
           collapsed: tabGroup.collapsed,
         });
       }
+
+      window.close();
     } else if (
       result.type == "link" ||
       result.type == "history" ||
       result.type == "bookmark"
     ) {
-      window.location = result.type == "link" ? result.context : result.desc;
+      window.location = result.URL;
     }
   }
 
-  showContextMenu() {}
+  showContextMenu() {
+    var cm = document.getElementById("cm");
+
+    cm.innerHTML = "";
+    var result = this.selectedElement;
+
+    cm.style.top = 70 + this.selectedIndex * 50 + "px";
+
+    result.contextMenu.items.forEach((item) => {
+      console.log(item);
+      if (item == "separator") {
+        cm.innerHTML += '<div class="menu-separator"></div>';
+      } else {
+        cm.innerHTML += `
+          <div class="menu-item ${item.type}">
+            <div class="menu-item-icon material-symbols-rounded">${item.icon}</div>
+            <div class="menu-item-text">${item.title} ${ item.key != "" ? '<span class="key"' + item.keyIcon ? 'material-symbols-rounded' : '' + '">' + item.key + '</span>' : ""} ${ item.modifierKey != "" ? '+<span class="key"' + item.modifierKey ? 'material-symbols-rounded' : '' + '">' + item.modifierKey + '</span>' : ""}</div>
+          </div>
+        `;
+      }
+    });
+  }
 
   async handleSearchKeys(event) {
     if ((event.ctrlKey || event.altKey) && event.key != "Backspace") return;
@@ -385,7 +411,7 @@ export class Results {
           tab.id
         );
 
-        focusTab = new menuItem(
+        var focusTab = new menuItem(
           "Focus Tab",
           "center_focus_strong",
           "normal",
@@ -393,7 +419,7 @@ export class Results {
         );
         tabObj.contextMenu.append(focusTab);
 
-        openTab = new menuItem(
+        var openTab = new menuItem(
           "Open Tab",
           "open_in_new",
           "normal",
@@ -401,7 +427,7 @@ export class Results {
         );
         tabObj.contextMenu.append(openTab);
 
-        reloadTab = new menuItem(
+        var reloadTab = new menuItem(
           "Reload Tab",
           "refresh",
           "normal",
@@ -411,7 +437,7 @@ export class Results {
 
         tabObj.contextMenu.append("separator");
 
-        pinTab = new menuItem(
+        var pinTab = new menuItem(
           "Pin Tab",
           "push_pin",
           "favorite",
@@ -419,7 +445,7 @@ export class Results {
         );
         tabObj.contextMenu.append(pinTab);
 
-        copyURL = new menuItem(
+        var copyURL = new menuItem(
           "Copy URL",
           "content_copy",
           "link",
@@ -427,12 +453,12 @@ export class Results {
         );
         tabObj.contextMenu.append(copyURL);
 
-        closeTab = new menuItem(
+        var closeTab = new menuItem(
           "Close Tab",
           "close",
           "danger",
           action.closeTab()
-        )
+        );
         tabObj.contextMenu.append(closeTab);
 
         this.results.push(tabObj);
@@ -459,6 +485,32 @@ export class Results {
                     child.url,
                     child.id
                   );
+
+                  var open = new menuItem(
+                    "Open",
+                    "center_focus_strong",
+                    "normal",
+                    action.openTab()
+                  );
+                  bookmarkObj.contextMenu.append(open);
+
+                  bookmarkObj.contextMenu.append("separator");
+
+                  var copyURL = new menuItem(
+                    "Copy URL",
+                    "content_copy",
+                    "link",
+                    action.copyDescToClipboard()
+                  );
+                  bookmarkObj.contextMenu.append(copyURL);
+
+                  var deleteBookmark = new menuItem(
+                    "Delete Bookmark",
+                    "delete",
+                    "danger",
+                    action.deleteBookmark()
+                  );
+                  bookmarkObj.contextMenu.append(deleteBookmark);
 
                   bookmarkList.push(bookmarkObj);
                 }
@@ -497,6 +549,47 @@ export class Results {
           history.url,
           history.id
         );
+
+        var open = new menuItem(
+          "Open",
+          "center_focus_strong",
+          "normal",
+          action.openTab()
+        );
+        historyObj.contextMenu.append(open);
+
+        historyObj.contextMenu.append("separator");
+
+        var copyURL = new menuItem(
+          "Copy URL",
+          "content_copy",
+          "link",
+          action.copyDescToClipboard()
+        );
+        historyObj.contextMenu.append(copyURL);
+
+        var deleteHistory = new menuItem(
+          "Delete from History",
+          "delete",
+          "danger",
+          action.deleteHistory()
+        );
+        deleteHistory.key = "del";
+        
+        historyObj.contextMenu.append(deleteHistory);
+
+        var clearHistory = new menuItem(
+          "Clear History!!",
+          "delete",
+          "danger",
+          action.clearHistory()
+        );
+
+        clearHistory.modifierKey = "shift"
+        clearHistory.modifierKeyIcon = true
+
+        clearHistory.key = "del";
+        historyObj.contextMenu.append(clearHistory);
 
         this.results.push(historyObj);
       });
@@ -633,7 +726,7 @@ export class TabResult extends Result {
     super(title, description, type, imageURL, icon);
 
     this.URL = URL;
-    this.tabID = ID;
+    this.ID = ID;
   }
 }
 
@@ -642,7 +735,7 @@ export class HistoryResult extends Result {
     super(title, description, type, imageURL, icon);
 
     this.URL = URL;
-    this.historyID = ID;
+    this.ID = ID;
   }
 }
 
@@ -651,7 +744,7 @@ export class BookmarkResult extends Result {
     super(title, description, type, imageURL, icon);
 
     this.URL = URL;
-    this.bookmarkID = ID;
+    this.ID = ID;
   }
 }
 
@@ -659,7 +752,7 @@ export class ExtensionResult extends Result {
   constructor(title, description, type, imageURL, icon, ID) {
     super(title, description, type, imageURL, icon);
 
-    this.extensionID = ID;
+    this.ID = ID;
   }
 }
 

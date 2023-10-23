@@ -297,6 +297,9 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  margin-right: 5px;
+  text-wrap: nowrap;
+  white-space: nowrap;
 }
 .context-menu .menu-item .menu-item-text .key {
   align-items: center;
