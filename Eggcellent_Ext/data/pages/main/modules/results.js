@@ -86,7 +86,7 @@ export class Results {
   }
 
   async handleDelKey(event) {
-    return
+    return;
     if (event.key != "Delete" || this.resultsCount <= 0) return;
     if (this.selectedIndex != -1) {
       var result = this.selectedElement;
@@ -124,7 +124,7 @@ export class Results {
             this.inContextMenu = false;
             this.contextMenuIndex = 0;
 
-            this.search()
+            this.search();
           }
         } else {
           await this.useResult();
