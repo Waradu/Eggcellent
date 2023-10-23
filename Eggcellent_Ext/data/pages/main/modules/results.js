@@ -86,6 +86,7 @@ export class Results {
   }
 
   async handleDelKey(event) {
+    return
     if (event.key != "Delete" || this.resultsCount <= 0) return;
     if (this.selectedIndex != -1) {
       var result = this.selectedElement;
@@ -113,7 +114,21 @@ export class Results {
       if (event.shiftKey) {
         this.showContextMenu();
       } else {
-        await this.useResult();
+        if (this.inContextMenu) {
+          var reload = this.selectedElement.contextMenu.items[
+            this.contextMenuIndex
+          ].action(this.selectedElement);
+          if (reload) {
+            var cm = document.getElementById("cm");
+            cm.style.display = "none";
+            this.inContextMenu = false;
+            this.contextMenuIndex = 0;
+
+            this.search()
+          }
+        } else {
+          await this.useResult();
+        }
       }
     } else if (this.searchTag.value != "" && this.beforeTag.innerHTML == "") {
       if (this.isURL(document.getElementById("search").value)) {
@@ -178,20 +193,43 @@ export class Results {
   showContextMenu() {
     var cm = document.getElementById("cm");
 
+    cm.style.display = "flex";
+
     cm.innerHTML = "";
     var result = this.selectedElement;
 
+    this.inContextMenu = true;
+
     cm.style.top = 70 + this.selectedIndex * 50 + "px";
 
-    result.contextMenu.items.forEach((item) => {
-      console.log(item);
+    result.contextMenu.items.forEach((item, index) => {
       if (item == "separator") {
         cm.innerHTML += '<div class="menu-separator"></div>';
       } else {
         cm.innerHTML += `
-          <div class="menu-item ${item.type}">
-            <div class="menu-item-icon material-symbols-rounded">${item.icon}</div>
-            <div class="menu-item-text">${item.title} ${ item.key != "" ? '<span class="key"' + item.keyIcon ? 'material-symbols-rounded' : '' + '">' + item.key + '</span>' : ""} ${ item.modifierKey != "" ? '+<span class="key"' + item.modifierKey ? 'material-symbols-rounded' : '' + '">' + item.modifierKey + '</span>' : ""}</div>
+          <div class="menu-item ${item.type} ${
+          this.contextMenuIndex == index ? "selected" : ""
+        }">
+            <div class="menu-item-icon material-symbols-rounded">${
+              item.icon
+            }</div>
+            <div class="menu-item-text">${item.title} <span class="keys">${
+          item.modifierKey != ""
+            ? '<span class="key"' +
+              (item.modifierKey ? "material-symbols-rounded" : "") +
+              '">' +
+              item.modifierKey +
+              "</span>"
+            : ""
+        } ${
+          item.key != ""
+            ? '<span class="key"' +
+              (item.keyIcon ? "material-symbols-rounded" : "") +
+              '">' +
+              item.key +
+              "</span>"
+            : ""
+        }</span></div>
           </div>
         `;
       }
@@ -262,6 +300,48 @@ export class Results {
 
   async handleNavigationKeys(event) {
     if (this.resultsCount <= 0) return;
+
+    if (this.inContextMenu) {
+      if (event.key == "ArrowUp") {
+        event.preventDefault();
+        this.contextMenuIndex -= 1;
+        if (
+          this.selectedElement.contextMenu.items[this.contextMenuIndex] ==
+          "separator"
+        ) {
+          this.contextMenuIndex -= 1;
+        }
+        if (this.contextMenuIndex < 0) {
+          this.contextMenuIndex =
+            this.selectedElement.contextMenu.items.length - 1;
+        }
+        this.showContextMenu();
+      } else if (event.key == "ArrowDown") {
+        event.preventDefault();
+        this.contextMenuIndex += 1;
+        if (
+          this.selectedElement.contextMenu.items[this.contextMenuIndex] ==
+          "separator"
+        ) {
+          this.contextMenuIndex += 1;
+        }
+        if (
+          this.contextMenuIndex == this.selectedElement.contextMenu.items.length
+        ) {
+          this.contextMenuIndex = 0;
+        }
+        this.showContextMenu();
+      } else if (event.key == "Escape") {
+        event.preventDefault();
+        var cm = document.getElementById("cm");
+        cm.style.display = "none";
+        this.inContextMenu = false;
+        this.contextMenuIndex = 0;
+      }
+
+      return;
+    }
+
     if (event.key == "ArrowUp") {
       event.preventDefault();
       await this.selectedElementHandler("up");
@@ -438,7 +518,7 @@ export class Results {
         tabObj.contextMenu.append("separator");
 
         var pinTab = new menuItem(
-          "Pin Tab",
+          "Toggle Pin",
           "push_pin",
           "favorite",
           action.pinTab()
@@ -575,18 +655,18 @@ export class Results {
           action.deleteHistory()
         );
         deleteHistory.key = "del";
-        
+
         historyObj.contextMenu.append(deleteHistory);
 
         var clearHistory = new menuItem(
-          "Clear History!!",
+          "Clear History!",
           "delete",
           "danger",
           action.clearHistory()
         );
 
-        clearHistory.modifierKey = "shift"
-        clearHistory.modifierKeyIcon = true
+        clearHistory.modifierKey = "shift";
+        clearHistory.modifierKeyIcon = true;
 
         clearHistory.key = "del";
         historyObj.contextMenu.append(clearHistory);

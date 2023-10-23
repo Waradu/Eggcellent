@@ -14,10 +14,10 @@ export class menuItem {
     this.icon = icon;
     this.type = type;
     this.action = action;
-    this.modifierKey = "del";
-    this.key = "del";
-    this.modifierKeyIcon = false
-    this.keyIcon = false
+    this.modifierKey = "";
+    this.key = "";
+    this.modifierKeyIcon = false;
+    this.keyIcon = false;
     this.enabled = true;
     this.closeMenuOnAction = false;
     this.needsConfirmation = false;
@@ -26,9 +26,14 @@ export class menuItem {
 }
 
 export class menuItemAction {
-  openTab(newTab) {
+  openTab(newTab = false) {
     var action = (item) => {
-      window.open(item.URL, newTab ? "_blank" : "");
+      if (newTab) {
+        window.open(item.URL, "_blank");
+      } else {
+        window.location = item.URL;
+      }
+      return true
     };
     return action;
   }
@@ -36,13 +41,17 @@ export class menuItemAction {
   copyDescToClipboard() {
     var action = (item) => {
       navigator.clipboard.writeText(item.URL);
+      return false
     };
     return action;
   }
 
   pinTab() {
     var action = (item) => {
-      chrome.tabs.update(item.ID, { pinned: true });
+      chrome.tabs.get(item.ID, (tab) => {
+        chrome.tabs.update(item.ID, { pinned: !tab.pinned });
+      });
+      return false
     };
     return action;
   }
@@ -50,6 +59,7 @@ export class menuItemAction {
   reloadTab() {
     var action = (item) => {
       chrome.tabs.reload(item.ID);
+      return false
     };
     return action;
   }
@@ -57,6 +67,7 @@ export class menuItemAction {
   clearHistory() {
     var action = async (item) => {
       chrome.history.deleteAll();
+      return true
     };
     return action;
   }
@@ -81,6 +92,7 @@ export class menuItemAction {
           collapsed: tabGroup.collapsed,
         });
       }
+      return false
     };
     return action;
   }
@@ -88,6 +100,7 @@ export class menuItemAction {
   closeTab() {
     var action = (item) => {
       chrome.tabs.remove(item.ID);
+      return true
     };
     return action;
   }
@@ -95,6 +108,7 @@ export class menuItemAction {
   deleteHistory() {
     var action = (item) => {
       chrome.history.deleteUrl({ url: item.URL });
+      return true
     };
     return action;
   }
@@ -102,6 +116,7 @@ export class menuItemAction {
   deleteBookmark() {
     var action = (item) => {
       chrome.bookmarks.remove(item.ID);
+      return true
     };
     return action;
   }
