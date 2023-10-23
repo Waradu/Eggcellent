@@ -40,7 +40,7 @@ export class menuItemAction {
 
   copyDescToClipboard() {
     var action = (item) => {
-      navigator.clipboard.writeText(item.URL);
+      navigator.clipboard.writeText(item.description);
       return false
     };
     return action;
@@ -66,7 +66,7 @@ export class menuItemAction {
 
   clearHistory() {
     var action = async (item) => {
-      chrome.history.deleteAll();
+      await chrome.history.deleteAll();
       return true
     };
     return action;
@@ -98,24 +98,24 @@ export class menuItemAction {
   }
 
   closeTab() {
-    var action = (item) => {
-      chrome.tabs.remove(item.ID);
+    var action = async (item) => {
+      await chrome.tabs.remove(item.ID);
       return true
     };
     return action;
   }
 
   deleteHistory() {
-    var action = (item) => {
-      chrome.history.deleteUrl({ url: item.URL });
+    var action = async (item) => {
+      await chrome.history.deleteUrl({ url: item.URL });
       return true
     };
     return action;
   }
 
   deleteBookmark() {
-    var action = (item) => {
-      chrome.bookmarks.remove(item.ID);
+    var action = async (item) => {
+      await chrome.bookmarks.remove(item.ID);
       return true
     };
     return action;

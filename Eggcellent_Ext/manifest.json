@@ -10,7 +10,8 @@
     "tabs",
     "tabGroups",
     "bookmarks",
-    "history"
+    "history",
+    "management"
   ],
   "icons": {
     "512": "data/assets/icons/512x512.png"

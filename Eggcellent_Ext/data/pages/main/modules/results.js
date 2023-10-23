@@ -15,6 +15,8 @@ export class Results {
     this.inContextMenu = false;
     this.contextMenuIndex = 0;
 
+    this.popupOpened = false;
+
     this.searchTag = document.getElementById("search");
     this.beforeTag = document.getElementById("before");
     this.resultTag = document.getElementById("results");
@@ -44,6 +46,18 @@ export class Results {
         key: "",
         text: "Tabs:",
         type: "tab",
+        disableFuse: false,
+      },
+      {
+        key: "=",
+        text: "=",
+        type: "math",
+        disableFuse: true,
+      },
+      {
+        key: "-",
+        text: "Extensions:",
+        type: "extension",
         disableFuse: false,
       },
     ];
@@ -87,7 +101,8 @@ export class Results {
 
   async handleDelKey(event) {
     return;
-    if (event.key != "Delete" || this.resultsCount <= 0) return;
+    if (event.key != "Delete" || this.resultsCount <= 0 || this.popupOpened)
+      return;
     if (this.selectedIndex != -1) {
       var result = this.selectedElement;
 
@@ -110,35 +125,92 @@ export class Results {
     if (event.key != "Enter") return;
     event.preventDefault();
 
-    if (this.selectedIndex != -1 && this.resultsCount > 0) {
-      if (event.shiftKey) {
-        this.showContextMenu();
-      } else {
-        if (this.inContextMenu) {
-          var reload = this.selectedElement.contextMenu.items[
-            this.contextMenuIndex
-          ].action(this.selectedElement);
-          if (reload) {
-            var cm = document.getElementById("cm");
-            cm.style.display = "none";
-            this.inContextMenu = false;
-            this.contextMenuIndex = 0;
+    if (this.popupOpened) {
+      var item = this.selectedElement.contextMenu.items[this.contextMenuIndex];
 
-            this.search();
-          }
-        } else {
-          await this.useResult();
-        }
+      var reload = item.action(this.selectedElement);
+
+      if (reload) {
+        var cm = document.getElementById("cm");
+        cm.style.display = "none";
+        this.inContextMenu = false;
+        this.contextMenuIndex = 0;
+
+        this.search();
       }
-    } else if (this.searchTag.value != "" && this.beforeTag.innerHTML == "") {
-      if (this.isURL(document.getElementById("search").value)) {
-        window.location = this.formatURL(
-          encodeURIComponent(document.getElementById("search").value)
-        );
-      } else {
-        window.location = `https://www.google.com/search?q=${encodeURIComponent(
-          document.getElementById("search").value
-        )}`;
+
+      var overlay = document.getElementById("overlay");
+      overlay.style.display = "none";
+
+      var confirm = document.getElementById("confirm");
+      var cancel = document.getElementById("cancel");
+
+      var clonedElement = confirm.cloneNode(true);
+      confirm.parentNode.replaceChild(clonedElement, confirm);
+
+      clonedElement = cancel.cloneNode(true);
+      cancel.parentNode.replaceChild(clonedElement, cancel);
+
+      this.popupOpened = false;
+    } else {
+      if (this.selectedIndex != -1 && this.resultsCount > 0) {
+        if (event.shiftKey) {
+          this.showContextMenu();
+        } else {
+          var item =
+            this.selectedElement.contextMenu.items[this.contextMenuIndex];
+          if (this.inContextMenu) {
+            if (item.needsConfirmation) {
+              var overlay = document.getElementById("overlay");
+              var confirm = document.getElementById("confirm");
+              var cancel = document.getElementById("cancel");
+
+              overlay.style.display = "flex";
+
+              this.popupOpened = true;
+
+              var runEvent = confirm.addEventListener("click", () => {
+                item.action(this.selectedElement);
+                overlay.style.display = "none";
+                confirm.removeEventListener("click", runEvent);
+                cancel.removeEventListener("click", cancelEvent);
+                this.popupOpened = false;
+
+                this.showContextMenu();
+              });
+
+              var cancelEvent = cancel.addEventListener("click", () => {
+                overlay.style.display = "none";
+                cancel.removeEventListener("click", cancelEvent);
+                confirm.removeEventListener("click", runEvent);
+                this.popupOpened = false;
+              });
+            } else {
+              var reload = await item.action(this.selectedElement);
+              if (reload) {
+                var cm = document.getElementById("cm");
+                cm.style.display = "none";
+                this.inContextMenu = false;
+                this.contextMenuIndex = 0;
+
+                this.search();
+              }
+              this.showContextMenu();
+            }
+          } else {
+            await this.useResult();
+          }
+        }
+      } else if (this.searchTag.value != "" && this.beforeTag.innerHTML == "") {
+        if (this.isURL(document.getElementById("search").value)) {
+          window.location = this.formatURL(
+            encodeURIComponent(document.getElementById("search").value)
+          );
+        } else {
+          window.location = `https://www.google.com/search?q=${encodeURIComponent(
+            document.getElementById("search").value
+          )}`;
+        }
       }
     }
   }
@@ -181,6 +253,8 @@ export class Results {
       }
 
       window.close();
+    } else if (result.type == "math") {
+      navigator.clipboard.writeText(result.title);
     } else if (
       result.type == "link" ||
       result.type == "history" ||
@@ -202,14 +276,28 @@ export class Results {
 
     cm.style.top = 70 + this.selectedIndex * 50 + "px";
 
+    var notFound = true;
+
+    if (!result.contextMenu.items[this.contextMenuIndex].enabled) {
+      result.contextMenu.items.forEach((item, index) => {
+        if (item != "separator") {
+          if (item.enabled && notFound) {
+            this.contextMenuIndex = index;
+            notFound = false;
+            return;
+          }
+        }
+      });
+    }
+
     result.contextMenu.items.forEach((item, index) => {
       if (item == "separator") {
         cm.innerHTML += '<div class="menu-separator"></div>';
       } else {
         cm.innerHTML += `
           <div class="menu-item ${item.type} ${
-          this.contextMenuIndex == index ? "selected" : ""
-        }">
+          item.enabled ? "" : "disabled"
+        } ${this.contextMenuIndex == index ? "selected" : ""}">
             <div class="menu-item-icon material-symbols-rounded">${
               item.icon
             }</div>
@@ -237,7 +325,34 @@ export class Results {
   }
 
   async handleSearchKeys(event) {
-    if ((event.ctrlKey || event.altKey) && event.key != "Backspace") return;
+    if (
+      !this.popupOpened &&
+      this.inContextMenu &&
+      !(event.ctrlKey || event.altKey) &&
+      !(
+        event.key == "Enter" ||
+        event.key == "ArrowUp" ||
+        event.key == "ArrowDown" ||
+        event.key == "Shift" ||
+        event.key == "Escape"
+      )
+    ) {
+      var cm = document.getElementById("cm");
+      cm.style.display = "none";
+      this.inContextMenu = false;
+      this.contextMenuIndex = 0;
+    }
+    if (this.popupOpened && !(event.ctrlKey || event.altKey)) {
+      event.preventDefault();
+    }
+    if (
+      (event.ctrlKey ||
+        event.altKey ||
+        this.popupOpened ||
+        this.inContextMenu) &&
+      event.key != "Backspace"
+    )
+      return;
 
     if (
       /^[0-9a-zA-Z.,\-\<\>\=]$/.test(event.key) &&
@@ -315,6 +430,26 @@ export class Results {
           this.contextMenuIndex =
             this.selectedElement.contextMenu.items.length - 1;
         }
+        while (true) {
+          try {
+            if (
+              this.selectedElement.contextMenu.items[this.contextMenuIndex]
+                .enabled === false ||
+              this.selectedElement.contextMenu.items[this.contextMenuIndex] ===
+                "separator"
+            ) {
+              this.contextMenuIndex -= 1;
+            } else {
+              break;
+            }
+          } catch (error) {
+            break; // Exit the loop on error.
+          }
+        }
+        if (this.contextMenuIndex < 0) {
+          this.contextMenuIndex =
+            this.selectedElement.contextMenu.items.length - 1;
+        }
         this.showContextMenu();
       } else if (event.key == "ArrowDown") {
         event.preventDefault();
@@ -333,10 +468,26 @@ export class Results {
         this.showContextMenu();
       } else if (event.key == "Escape") {
         event.preventDefault();
-        var cm = document.getElementById("cm");
-        cm.style.display = "none";
-        this.inContextMenu = false;
-        this.contextMenuIndex = 0;
+        if (this.popupOpened) {
+          var overlay = document.getElementById("overlay");
+          overlay.style.display = "none";
+
+          var confirm = document.getElementById("confirm");
+          var cancel = document.getElementById("cancel");
+
+          var clonedElement = confirm.cloneNode(true);
+          confirm.parentNode.replaceChild(clonedElement, confirm);
+
+          clonedElement = cancel.cloneNode(true);
+          cancel.parentNode.replaceChild(clonedElement, cancel);
+
+          this.popupOpened = false;
+        } else {
+          var cm = document.getElementById("cm");
+          cm.style.display = "none";
+          this.inContextMenu = false;
+          this.contextMenuIndex = 0;
+        }
       }
 
       return;
@@ -541,6 +692,8 @@ export class Results {
         );
         tabObj.contextMenu.append(closeTab);
 
+        closeTab.needsConfirmation = true;
+
         this.results.push(tabObj);
       });
     }
@@ -668,11 +821,147 @@ export class Results {
         clearHistory.modifierKey = "shift";
         clearHistory.modifierKeyIcon = true;
 
+        clearHistory.needsConfirmation = true;
+
         clearHistory.key = "del";
         historyObj.contextMenu.append(clearHistory);
 
         this.results.push(historyObj);
       });
+    }
+
+    if (this.searchType == "math") {
+      var extension = new Result(
+        math.evaluate(this.term) || "Error",
+        `Solved: ${this.term}`,
+        "math",
+        "https://cdn-icons-png.flaticon.com/512/212/212376.png",
+        "calculate"
+      );
+
+      var copyResult = new menuItem(
+        "Copy Result",
+        "content_copy",
+        "link",
+        (item) => {
+          navigator.clipboard.writeText(item.title);
+          return false;
+        }
+      );
+      extension.contextMenu.append(copyResult);
+
+      this.results.push(extension);
+    }
+
+    if (this.searchType == "extension") {
+      let extensions = await chrome.management.getAll();
+
+      for (const ext of extensions) {
+        if (ext.type === "extension") {
+          var icon = "";
+
+          try {
+            icon = ext.icons[ext.icons.length - 1].url;
+          } catch {}
+
+          var extension = new ExtensionResult(
+            ext.name,
+            ext.description,
+            "extension",
+            icon,
+            "extension"
+          );
+
+          var version = new menuItem(
+            "Version: " + ext.version,
+            "conversion_path",
+            "normal",
+            (item) => {}
+          );
+
+          version.enabled = false;
+
+          extension.contextMenu.append(version);
+
+          var enabled = new menuItem(
+            "Enabled: " + ext.enabled,
+            "radio_button_partial",
+            "normal",
+            (item) => {}
+          );
+
+          enabled.enabled = false;
+
+          extension.contextMenu.append(enabled);
+
+          extension.contextMenu.append("separator");
+
+          var toggle = new menuItem(
+            "Toggle Extension",
+            "extension",
+            "normal",
+            async (item) => {
+              const info = await new Promise((resolve) => {
+                chrome.management.get(ext.id, (extensionInfo) => {
+                  resolve(extensionInfo);
+                });
+              });
+
+              const newState = !info.enabled;
+              chrome.management.setEnabled(ext.id, newState);
+
+              item.contextMenu.items[1].title = "Enabled: " + newState;
+              return false;
+            }
+          );
+
+          if(ext.id != chrome.runtime.id) {
+            extension.contextMenu.append(toggle);
+          }
+
+          var toggle = new menuItem(
+            "Copy Name",
+            "content_copy",
+            "link",
+            (item) => {
+              navigator.clipboard.writeText(ext.shortName);
+              return false;
+            }
+          );
+          extension.contextMenu.append(toggle);
+
+          if(ext.id != chrome.runtime.id) {
+            extension.contextMenu.append("separator");
+          }
+
+          var copyResult = new menuItem(
+            "Copy ID",
+            "content_copy",
+            "link",
+            (item) => {
+              navigator.clipboard.writeText(ext.id);
+              return false;
+            }
+          );
+          extension.contextMenu.append(copyResult);
+
+          var uninstall = new menuItem(
+            "Uninstall",
+            "delete",
+            "danger",
+            (item) => {
+              chrome.management.uninstall(ext.id);
+              return true;
+            }
+          );
+
+          if(ext.id != chrome.runtime.id) {
+            extension.contextMenu.append(uninstall);
+          }
+
+          this.results.push(extension);
+        }
+      }
     }
 
     this.results.sort((a, b) => {
@@ -834,8 +1123,4 @@ export class ExtensionResult extends Result {
 
     this.ID = ID;
   }
-}
-
-export class WidgetResult extends Result {
-  // Soon
 }
