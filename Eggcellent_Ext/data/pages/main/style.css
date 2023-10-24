@@ -19,8 +19,8 @@ html.default-theme {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #191A23;
-  color: #d2d3e0;
+  background-color: #181A24;
+  color: #d1d3e1;
   min-width: 300px;
   font-family: Inter;
 }
@@ -79,13 +79,13 @@ html.default-theme .preserve-position .search-container .search-bar .before {
 html.default-theme .preserve-position .search-container .search-bar .input {
   width: calc(100% - 40px);
   padding-right: 20px;
-  color: #d2d3e0;
+  color: #d1d3e1;
   background: transparent;
   border: none;
   outline: none;
   font-family: Inter;
   font-size: 18px;
-  caret-color: #d2d3e0;
+  caret-color: #d1d3e1;
 }
 html.default-theme .preserve-position .search-container .search-bar .input::-moz-placeholder {
   color: #858699;
@@ -151,7 +151,7 @@ html.default-theme .preserve-position .search-container .search-results .result 
   text-transform: lowercase;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #d2d3e0;
+  color: #d1d3e1;
   font-weight: 100;
 }
 html.default-theme .preserve-position .search-container .search-results .result .qa-icon {
@@ -175,7 +175,7 @@ html.default-theme .preserve-position .search-container .search-results .result.
   color: #eeeffc;
 }
 html.default-theme .preserve-position .search-container .search-results .result.always-select .text .desc {
-  color: #d2d3e0;
+  color: #d1d3e1;
 }
 html.default-theme .preserve-position .search-container .footer {
   display: grid;
@@ -333,10 +333,10 @@ html.default-theme .context-menu .menu-item.favorite:hover, html.default-theme .
   background-color: rgba(244, 187, 41, 0.1882352941);
 }
 html.default-theme .context-menu .menu-item.link {
-  color: #575ac6;
+  color: #565ac7;
 }
 html.default-theme .context-menu .menu-item.link .menu-item-icon {
-  color: #575ac6;
+  color: #565ac7;
   font-size: 20px;
 }
 html.default-theme .context-menu .menu-item.link:hover, html.default-theme .context-menu .menu-item.link.selected {
@@ -392,7 +392,7 @@ html.default-theme .overlay Button {
   padding: 12px;
   padding-inline: 28px;
   border-radius: 12px;
-  color: #d2d3e0;
+  color: #d1d3e1;
   font-size: 20px;
   transition: 0.2s;
   display: flex;
