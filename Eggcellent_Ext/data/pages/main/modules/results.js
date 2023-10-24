@@ -983,7 +983,7 @@ export class Results {
         return 1;
       }
 
-      const nameA = a.title.toLowerCase();
+      /* const nameA = a.title.toLowerCase();
       const nameB = b.title.toLowerCase();
 
       if (nameA < nameB) {
@@ -992,7 +992,7 @@ export class Results {
       if (nameA > nameB) {
         return 1;
       }
-      return 0;
+      return 0; */
     });
   }
 
