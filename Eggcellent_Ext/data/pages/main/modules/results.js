@@ -696,8 +696,6 @@ export class Results {
         );
         tabObj.contextMenu.append(closeTab);
 
-        closeTab.needsConfirmation = true;
-
         this.results.push(tabObj);
       });
     }

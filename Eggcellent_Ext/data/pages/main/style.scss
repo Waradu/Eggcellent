@@ -1,4 +1,6 @@
 @use "../../../../shared/default" as default;
+@use "../../../../shared/purple" as purpleTheme;
+@use 'sass:color';
 
 @font-face {
   font-family: Maax;
@@ -81,6 +83,15 @@
       justify-content: center;
       align-items: flex-start;
       position: relative;
+
+      .header {
+        position: absolute;
+        top: -80px;
+
+        font-size: 40px;
+        color: $bg;
+        filter: brightness(150%);
+      }
 
       .search-container {
         background-color: $popup-opaque-color;
@@ -569,6 +580,46 @@
   default.$button-border,
   default.$button-hover-color,
   default.$button-hover-border
+);
+
+@include theme(
+  purple-theme,
+  purpleTheme.$bg,
+  purpleTheme.$bg-lighter,
+  purpleTheme.$bg-dark,
+  purpleTheme.$egg,
+  purpleTheme.$egg-light,
+  purpleTheme.$primary,
+  purpleTheme.$primary-light,
+  purpleTheme.$danger,
+  purpleTheme.$danger-light,
+  purpleTheme.$success,
+  purpleTheme.$success-light,
+  purpleTheme.$text-color,
+  purpleTheme.$text-color-dark,
+  purpleTheme.$text-color-light,
+  purpleTheme.$icon-color,
+  purpleTheme.$element-icon-color,
+  purpleTheme.$element-hover,
+  purpleTheme.$element-hover-icon-color,
+  purpleTheme.$border-color,
+  purpleTheme.$border-color-darker,
+  purpleTheme.$border-hover-color,
+  purpleTheme.$tabs-color,
+  purpleTheme.$tabs-active-color,
+  purpleTheme.$tabs-active-shadow,
+  purpleTheme.$tabs-active-border,
+  purpleTheme.$popup-color,
+  purpleTheme.$popup-opaque-color,
+  purpleTheme.$popup-hover-color,
+  purpleTheme.$popup-shadow,
+  purpleTheme.$popup-border,
+  purpleTheme.$popup-border-color,
+  purpleTheme.$button-color,
+  purpleTheme.$button-shadow,
+  purpleTheme.$button-border,
+  purpleTheme.$button-hover-color,
+  purpleTheme.$button-hover-border
 );
 
 @keyframes show {
