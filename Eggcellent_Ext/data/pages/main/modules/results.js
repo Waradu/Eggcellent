@@ -128,7 +128,7 @@ export class Results {
     if (this.popupOpened) {
       var item = this.selectedElement.contextMenu.items[this.contextMenuIndex];
 
-      var reload = item.action(this.selectedElement);
+      var reload = await item.action(this.selectedElement);
 
       if (reload) {
         var cm = document.getElementById("cm");
@@ -169,13 +169,14 @@ export class Results {
 
               this.popupOpened = true;
 
-              var runEvent = confirm.addEventListener("click", () => {
-                item.action(this.selectedElement);
+              var runEvent = confirm.addEventListener("click", async () => {
+                await item.action(this.selectedElement);
                 overlay.style.display = "none";
                 confirm.removeEventListener("click", runEvent);
                 cancel.removeEventListener("click", cancelEvent);
                 this.popupOpened = false;
 
+                this.search();
                 this.showContextMenu();
               });
 
@@ -184,6 +185,8 @@ export class Results {
                 cancel.removeEventListener("click", cancelEvent);
                 confirm.removeEventListener("click", runEvent);
                 this.popupOpened = false;
+
+                this.search();
               });
             } else {
               var reload = await item.action(this.selectedElement);
@@ -194,8 +197,9 @@ export class Results {
                 this.contextMenuIndex = 0;
 
                 this.search();
+              } else {
+                this.showContextMenu();
               }
-              this.showContextMenu();
             }
           } else {
             await this.useResult();
@@ -651,7 +655,7 @@ export class Results {
         tabObj.contextMenu.append(focusTab);
 
         var openTab = new menuItem(
-          "Open Tab",
+          "Open",
           "open_in_new",
           "normal",
           action.openTab()
@@ -721,7 +725,7 @@ export class Results {
 
                   var open = new menuItem(
                     "Open",
-                    "center_focus_strong",
+                    "open_in_new",
                     "normal",
                     action.openTab()
                   );
@@ -785,7 +789,7 @@ export class Results {
 
         var open = new menuItem(
           "Open",
-          "center_focus_strong",
+          "open_in_new",
           "normal",
           action.openTab()
         );
@@ -876,7 +880,9 @@ export class Results {
             "Version: " + ext.version,
             "conversion_path",
             "normal",
-            (item) => {}
+            (item) => {
+
+            }
           );
 
           version.enabled = false;
@@ -915,7 +921,7 @@ export class Results {
             }
           );
 
-          if(ext.id != chrome.runtime.id) {
+          if (ext.id != chrome.runtime.id) {
             extension.contextMenu.append(toggle);
           }
 
@@ -930,7 +936,7 @@ export class Results {
           );
           extension.contextMenu.append(toggle);
 
-          if(ext.id != chrome.runtime.id) {
+          if (ext.id != chrome.runtime.id) {
             extension.contextMenu.append("separator");
           }
 
@@ -955,7 +961,7 @@ export class Results {
             }
           );
 
-          if(ext.id != chrome.runtime.id) {
+          if (ext.id != chrome.runtime.id) {
             extension.contextMenu.append(uninstall);
           }
 
