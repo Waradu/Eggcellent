@@ -161,6 +161,9 @@ html.default-theme .preserve-position .search-container .search-results .result 
   color: #d1d3e1;
   font-weight: 100;
 }
+html.default-theme .preserve-position .search-container .search-results .result.extension .text .desc {
+  text-transform: none;
+}
 html.default-theme .preserve-position .search-container .search-results .result .qa-icon {
   height: 30px !important;
   aspect-ratio: 1/1;
@@ -591,6 +594,9 @@ html.purple-theme .preserve-position .search-container .search-results .result .
   white-space: nowrap;
   color: #d2d3e0;
   font-weight: 100;
+}
+html.purple-theme .preserve-position .search-container .search-results .result.extension .text .desc {
+  text-transform: none;
 }
 html.purple-theme .preserve-position .search-container .search-results .result .qa-icon {
   height: 30px !important;

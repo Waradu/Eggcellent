@@ -213,6 +213,14 @@
               }
             }
 
+            &.extension {
+              .text {
+                .desc {
+                  text-transform: none;
+                }
+              }
+            }
+
             .qa-icon {
               height: 30px !important;
               aspect-ratio: 1 / 1;

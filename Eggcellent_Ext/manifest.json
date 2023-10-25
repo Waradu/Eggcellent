@@ -1,5 +1,6 @@
 {
-  "name": "Eggcellent",
+  "name": "Eggcellent Search",
+  "shortName": "Eggcellent",
   "manifest_version": 3,
   "version": "0.3.1",
   "background": {
@@ -20,7 +21,7 @@
     "default_title": "Open Quick Menu",
     "default_popup": "data/pages/popup/index.html"
   },
-  "description": "Sort Tabs",
+  "description": "A free search bar to manage your browser. Eggspand your productivity and eggsplore new possibilities.",
   "offline_enabled": true,
   "options_page": "data/pages/options/index.html",
   "commands": {

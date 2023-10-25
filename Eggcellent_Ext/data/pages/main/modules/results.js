@@ -928,7 +928,7 @@ export class Results {
             "content_copy",
             "link",
             (item) => {
-              navigator.clipboard.writeText(ext.shortName);
+              navigator.clipboard.writeText(ext.name);
               return false;
             }
           );
@@ -1011,21 +1011,19 @@ export class Results {
     var index = 0;
     this.fuseResults.forEach((ele) => {
       this.resultTag.innerHTML += `
-        <div title="${
-          ele.title
-        }" class="result" data-index="${index++}" style="--delay: ${
+        <div class="result ${ele.type}" data-index="${index++}" style="--delay: ${
         index / 30
       }s;">
-          <img src="${ele.imageURL}" class="icon">
-          <div class="text">${ele.title}<div class="desc">${
+          <img src="${ele.imageURL}" class="icon" title="${ele.imageURL}">
+          <div class="text"><span title="${ele.title}">${ele.title}</span><div class="desc" title="${ele.description}">${
         ele.description
       }</div></div>
           ${
             ele.favorite
-              ? '<div class="qa-icon favorite material-symbols-rounded">star</div>'
+              ? '<div class="qa-icon favorite material-symbols-rounded" title="Favorite">star</div>'
               : ""
           }
-          <div class="qa-icon material-symbols-rounded">${ele.icon}</div>
+          <div class="qa-icon material-symbols-rounded" title="${ele.type}">${ele.icon}</div>
         </div>
       `;
     });
