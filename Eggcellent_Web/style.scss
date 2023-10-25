@@ -17,7 +17,27 @@ html {
     align-items: center;
 
     .container {
-      width: 500px;
+      width: clamp(300px, 40%, 1000px);
+
+      .download {
+        background-color: s.$button-color;
+        box-shadow: s.$button-shadow;
+        width: max-content;
+        padding: 12px;
+        padding-inline: 24px;
+        border-radius: 8px;
+        border: s.$button-border;
+        cursor: pointer;
+        transition: .2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        &:hover {
+          background-color: s.$button-hover-color;
+          border: s.$button-hover-border;
+        }
+      }
     }
 
     .confetti{

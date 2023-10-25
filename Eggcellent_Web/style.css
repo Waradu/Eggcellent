@@ -15,7 +15,26 @@ html body {
   align-items: center;
 }
 html body .container {
-  width: 500px;
+  width: clamp(300px, 40%, 1000px);
+}
+html body .container .download {
+  background-color: #272939;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1019607843);
+  width: -moz-max-content;
+  width: max-content;
+  padding: 12px;
+  padding-inline: 24px;
+  border-radius: 8px;
+  border: 1px solid #313248;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+html body .container .download:hover {
+  background-color: #2b2c44;
+  border: 1px solid #3e3e4a;
 }
 html body .confetti {
   display: block;

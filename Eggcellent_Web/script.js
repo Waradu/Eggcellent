@@ -99,7 +99,7 @@ var render = () => {
 };
 
 
-initConfetti();
+/* initConfetti(); */
 render();
 
 
