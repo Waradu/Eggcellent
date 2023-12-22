@@ -804,7 +804,7 @@ export class Results {
         historyObj.contextMenu.append(copyURL);
 
         var deleteHistory = new menuItem(
-          "Delete from History",
+          "Delete",
           "delete",
           "danger",
           action.deleteHistory()
