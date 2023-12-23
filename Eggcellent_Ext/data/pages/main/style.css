@@ -412,7 +412,6 @@ html.default-theme .overlay Button {
   gap: 10px;
   align-items: center;
   position: relative;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3137254902);
 }
 html.default-theme .overlay Button.confirm {
   border: 2px solid #4cb782;
@@ -846,7 +845,6 @@ html.purple-theme .overlay Button {
   gap: 10px;
   align-items: center;
   position: relative;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3137254902);
 }
 html.purple-theme .overlay Button.confirm {
   border: 2px solid #4cb782;

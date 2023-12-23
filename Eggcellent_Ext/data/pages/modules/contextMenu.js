@@ -1,4 +1,4 @@
-export class contextMenu {
+export class ContextMenu {
   constructor() {
     this.items = [];
   }
@@ -8,7 +8,7 @@ export class contextMenu {
   }
 }
 
-export class menuItem {
+export class MenuItem {
   constructor(title, icon, type, action) {
     this.title = title;
     this.icon = icon;
@@ -25,7 +25,7 @@ export class menuItem {
   }
 }
 
-export class menuItemAction {
+export class MenuItemAction {
   openTab(newTab = false) {
     var action = (item) => {
       if (newTab) {

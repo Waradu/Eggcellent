@@ -1,4 +1,6 @@
-import { contextMenu, menuItem, menuItemAction } from "./contextMenu.js";
+import { ContextMenu, MenuItem, MenuItemAction } from "./contextMenu.js";
+
+const jsConfetti = new JSConfetti();
 
 export class Results {
   constructor() {
@@ -62,6 +64,8 @@ export class Results {
       },
     ];
 
+    this.widgets = []
+
     this.patternsToExclude = [
       "chrome://",
       "chrome-extension://",
@@ -97,6 +101,14 @@ export class Results {
     });
 
     this.searchTag.focus();
+  }
+
+  addSearchType(s) {
+    this.searchTypes.push(s.toObject());
+  }
+
+  addWidget(w) {
+    this.widgets.push(w);
   }
 
   async handleDelKey(event) {
@@ -265,16 +277,21 @@ export class Results {
       result.type == "bookmark"
     ) {
       window.location = result.URL;
+    } else {
+      await result.runAction(result)
     }
   }
 
   showContextMenu() {
-    var cm = document.getElementById("cm");
-
-    cm.style.display = "flex";
-
-    cm.innerHTML = "";
     var result = this.selectedElement;
+    
+    if (result.contextMenu.items.length < 1) return;
+    
+    var cm = document.getElementById("cm");
+    
+    cm.style.display = "flex";
+    
+    cm.innerHTML = "";
 
     this.inContextMenu = true;
 
@@ -625,7 +642,7 @@ export class Results {
   async setResults() {
     this.results = [];
 
-    var action = new menuItemAction();
+    var action = new MenuItemAction();
 
     if (this.searchType == "all" || this.searchType == "tab") {
       var result = await chrome.tabs.query({});
@@ -646,7 +663,7 @@ export class Results {
           tab.id
         );
 
-        var focusTab = new menuItem(
+        var focusTab = new MenuItem(
           "Focus Tab",
           "center_focus_strong",
           "normal",
@@ -654,7 +671,7 @@ export class Results {
         );
         tabObj.contextMenu.append(focusTab);
 
-        var openTab = new menuItem(
+        var openTab = new MenuItem(
           "Open",
           "open_in_new",
           "normal",
@@ -662,7 +679,7 @@ export class Results {
         );
         tabObj.contextMenu.append(openTab);
 
-        var reloadTab = new menuItem(
+        var reloadTab = new MenuItem(
           "Reload Tab",
           "refresh",
           "normal",
@@ -672,7 +689,7 @@ export class Results {
 
         tabObj.contextMenu.append("separator");
 
-        var pinTab = new menuItem(
+        var pinTab = new MenuItem(
           "Toggle Pin",
           "push_pin",
           "favorite",
@@ -680,7 +697,7 @@ export class Results {
         );
         tabObj.contextMenu.append(pinTab);
 
-        var copyURL = new menuItem(
+        var copyURL = new MenuItem(
           "Copy URL",
           "content_copy",
           "link",
@@ -688,7 +705,7 @@ export class Results {
         );
         tabObj.contextMenu.append(copyURL);
 
-        var closeTab = new menuItem(
+        var closeTab = new MenuItem(
           "Close Tab",
           "close",
           "danger",
@@ -721,7 +738,7 @@ export class Results {
                     child.id
                   );
 
-                  var open = new menuItem(
+                  var open = new MenuItem(
                     "Open",
                     "open_in_new",
                     "normal",
@@ -731,7 +748,7 @@ export class Results {
 
                   bookmarkObj.contextMenu.append("separator");
 
-                  var copyURL = new menuItem(
+                  var copyURL = new MenuItem(
                     "Copy URL",
                     "content_copy",
                     "link",
@@ -739,7 +756,7 @@ export class Results {
                   );
                   bookmarkObj.contextMenu.append(copyURL);
 
-                  var deleteBookmark = new menuItem(
+                  var deleteBookmark = new MenuItem(
                     "Delete Bookmark",
                     "delete",
                     "danger",
@@ -785,7 +802,7 @@ export class Results {
           history.id
         );
 
-        var open = new menuItem(
+        var open = new MenuItem(
           "Open",
           "open_in_new",
           "normal",
@@ -795,7 +812,7 @@ export class Results {
 
         historyObj.contextMenu.append("separator");
 
-        var copyURL = new menuItem(
+        var copyURL = new MenuItem(
           "Copy URL",
           "content_copy",
           "link",
@@ -803,7 +820,7 @@ export class Results {
         );
         historyObj.contextMenu.append(copyURL);
 
-        var deleteHistory = new menuItem(
+        var deleteHistory = new MenuItem(
           "Delete",
           "delete",
           "danger",
@@ -813,7 +830,7 @@ export class Results {
 
         historyObj.contextMenu.append(deleteHistory);
 
-        var clearHistory = new menuItem(
+        var clearHistory = new MenuItem(
           "Clear History!",
           "delete",
           "danger",
@@ -841,7 +858,7 @@ export class Results {
         "calculate"
       );
 
-      var copyResult = new menuItem(
+      var copyResult = new MenuItem(
         "Copy Result",
         "content_copy",
         "link",
@@ -854,6 +871,28 @@ export class Results {
 
       this.results.push(extension);
     }
+
+    if (this.searchType == "command") {
+      var command = new Result(
+        "Confetti",
+        "Accomplished something? Celebrate with confetti!",
+        "command",
+        "https://th.bing.com/th/id/R.900f199ffaba8ab6d89703723422b01c?rik=HUQPszUeQ9ao1Q&pid=ImgRaw&r=0",
+        "celebration"
+      );
+
+      command.runAction = () => {
+        jsConfetti.addConfetti()
+      }
+
+      this.results.push(command);
+    }
+
+    this.widgets.forEach((widget) => {
+      if (this.searchType == widget.type) {
+        this.results.push(widget);
+      }
+    })
 
     if (this.searchType == "extension") {
       let extensions = await chrome.management.getAll();
@@ -874,20 +913,18 @@ export class Results {
             "extension"
           );
 
-          var version = new menuItem(
+          var version = new MenuItem(
             "Version: " + ext.version,
             "conversion_path",
             "normal",
-            (item) => {
-
-            }
+            (item) => {}
           );
 
           version.enabled = false;
 
           extension.contextMenu.append(version);
 
-          var enabled = new menuItem(
+          var enabled = new MenuItem(
             "Enabled: " + ext.enabled,
             "radio_button_partial",
             "normal",
@@ -900,7 +937,7 @@ export class Results {
 
           extension.contextMenu.append("separator");
 
-          var toggle = new menuItem(
+          var toggle = new MenuItem(
             "Toggle Extension",
             "extension",
             "normal",
@@ -923,7 +960,7 @@ export class Results {
             extension.contextMenu.append(toggle);
           }
 
-          var toggle = new menuItem(
+          var toggle = new MenuItem(
             "Copy Name",
             "content_copy",
             "link",
@@ -938,7 +975,7 @@ export class Results {
             extension.contextMenu.append("separator");
           }
 
-          var copyResult = new menuItem(
+          var copyResult = new MenuItem(
             "Copy ID",
             "content_copy",
             "link",
@@ -949,7 +986,7 @@ export class Results {
           );
           extension.contextMenu.append(copyResult);
 
-          var uninstall = new menuItem(
+          var uninstall = new MenuItem(
             "Uninstall",
             "delete",
             "danger",
@@ -1011,11 +1048,13 @@ export class Results {
     var index = 0;
     this.fuseResults.forEach((ele) => {
       this.resultTag.innerHTML += `
-        <div class="result ${ele.type}" data-index="${index++}" style="--delay: ${
-        index / 30
-      }s;">
-          <img src="${ele.imageURL}" class="icon" title="${ele.imageURL}">
-          <div class="text"><span title="${ele.title}">${ele.title}</span><div class="desc" title="${ele.description}">${
+        <div class="result ${
+          ele.type
+        }" data-index="${index++}" style="--delay: ${index / 30}s;">
+          <img src="${ele.imageURL == '' ? "./transparent.png" : ele.imageURL}" class="icon" title="${ele.imageURL}">
+          <div class="text"><span title="${ele.title}">${
+        ele.title
+      }</span><div class="desc" title="${ele.description}">${
         ele.description
       }</div></div>
           ${
@@ -1023,7 +1062,9 @@ export class Results {
               ? '<div class="qa-icon favorite material-symbols-rounded" title="Favorite">star</div>'
               : ""
           }
-          <div class="qa-icon material-symbols-rounded" title="${ele.type}">${ele.icon}</div>
+          <div class="qa-icon material-symbols-rounded" title="${ele.type}">${
+        ele.icon
+      }</div>
         </div>
       `;
     });
@@ -1088,7 +1129,10 @@ export class Result {
 
     this.favorite = false;
 
-    this.contextMenu = new contextMenu();
+    this.contextMenu = new ContextMenu();
+    this.runAction = () => {
+      console.log("No action defined!");
+    };
   }
 }
 
