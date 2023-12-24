@@ -12,12 +12,16 @@ export class Results {
     this.fuseResults = [];
     this.resultsCount = 0;
 
+    this.confettiCount = 1;
+    this.confettiSize = 5;
+
     this.selectedElement;
 
     this.inContextMenu = false;
     this.contextMenuIndex = 0;
 
     this.popupOpened = false;
+    this.popupType = "";
 
     this.searchTag = document.getElementById("search");
     this.beforeTag = document.getElementById("before");
@@ -40,7 +44,7 @@ export class Results {
       },
       {
         key: ">",
-        text: "Command:",
+        text: ">",
         type: "command",
         disableFuse: false,
       },
@@ -62,16 +66,17 @@ export class Results {
         type: "extension",
         disableFuse: false,
       },
+      {
+        key: "<",
+        text: "Todo:",
+        type: "todo",
+        disableFuse: true,
+      },
     ];
 
-    this.widgets = []
+    this.widgets = [];
 
-    this.patternsToExclude = [
-      "chrome://",
-      "chrome-extension://",
-      "edge://",
-      "edge-extension://",
-    ];
+    this.patternsToExclude = ["chrome-extension://", "edge-extension://"];
 
     this.fuseOptions = {
       includeScore: true,
@@ -173,33 +178,7 @@ export class Results {
             this.selectedElement.contextMenu.items[this.contextMenuIndex];
           if (this.inContextMenu) {
             if (item.needsConfirmation) {
-              var overlay = document.getElementById("overlay");
-              var confirm = document.getElementById("confirm");
-              var cancel = document.getElementById("cancel");
-
-              overlay.style.display = "flex";
-
-              this.popupOpened = true;
-
-              var runEvent = confirm.addEventListener("click", async () => {
-                await item.action(this.selectedElement);
-                overlay.style.display = "none";
-                confirm.removeEventListener("click", runEvent);
-                cancel.removeEventListener("click", cancelEvent);
-                this.popupOpened = false;
-
-                this.search();
-                this.showContextMenu();
-              });
-
-              var cancelEvent = cancel.addEventListener("click", () => {
-                overlay.style.display = "none";
-                cancel.removeEventListener("click", cancelEvent);
-                confirm.removeEventListener("click", runEvent);
-                this.popupOpened = false;
-
-                this.search();
-              });
+              this.confirm(item);
             } else {
               var reload = await item.action(this.selectedElement);
               if (reload) {
@@ -214,7 +193,11 @@ export class Results {
               }
             }
           } else {
-            await this.useResult();
+            if (item.needsConfirmation) {
+              this.confirm(item);
+            } else {
+              await this.useResult();
+            }
           }
         }
       } else if (this.searchTag.value != "" && this.beforeTag.innerHTML == "") {
@@ -228,6 +211,46 @@ export class Results {
           )}`;
         }
       }
+    }
+  }
+
+  confirm(item) {
+    if (item.confirmationType == "text") {
+      var overlay = document.getElementById("tex-overlay");
+      var label = document.getElementById("text-input-label");
+
+      overlay.style.display = "flex";
+      label.innerHTML = item.text;
+
+      this.popupOpened = true;
+    } else {
+      var overlay = document.getElementById("overlay");
+      var confirm = document.getElementById("confirm");
+      var cancel = document.getElementById("cancel");
+
+      overlay.style.display = "flex";
+
+      this.popupOpened = true;
+
+      var runEvent = confirm.addEventListener("click", async () => {
+        await item.action(this.selectedElement);
+        overlay.style.display = "none";
+        confirm.removeEventListener("click", runEvent);
+        cancel.removeEventListener("click", cancelEvent);
+        this.popupOpened = false;
+
+        this.search();
+        this.showContextMenu();
+      });
+
+      var cancelEvent = cancel.addEventListener("click", () => {
+        overlay.style.display = "none";
+        cancel.removeEventListener("click", cancelEvent);
+        confirm.removeEventListener("click", runEvent);
+        this.popupOpened = false;
+
+        this.search();
+      });
     }
   }
 
@@ -278,19 +301,19 @@ export class Results {
     ) {
       window.location = result.URL;
     } else {
-      await result.runAction(result)
+      await result.runAction(result);
     }
   }
 
   showContextMenu() {
     var result = this.selectedElement;
-    
+
     if (result.contextMenu.items.length < 1) return;
-    
+
     var cm = document.getElementById("cm");
-    
+
     cm.style.display = "flex";
-    
+
     cm.innerHTML = "";
 
     this.inContextMenu = true;
@@ -651,13 +674,11 @@ export class Results {
           !this.patternsToExclude.some((pattern) => item.url.includes(pattern))
       );
       result.forEach((tab) => {
-        var image = `https://www.google.com/s2/favicons?domain=${tab.url}&sz=128`;
-
         var tabObj = new TabResult(
           tab.title,
           tab.url,
           "tab",
-          image,
+          tab.favIconUrl,
           "toolbar",
           tab.url,
           tab.id
@@ -882,17 +903,54 @@ export class Results {
       );
 
       command.runAction = () => {
-        jsConfetti.addConfetti()
-      }
+        jsConfetti.addConfetti({
+          confettiRadius: this.confettiSize,
+          confettiNumber: 400 + 100 * this.confettiCount,
+        });
+        if (this.confettiCount < 5) {
+          this.confettiCount += 1;
+        }
+        if (this.confettiSize < 1) {
+          this.confettiSize += 0.1;
+        }
+      };
 
       this.results.push(command);
+    }
+
+    if (this.searchType == "todo") {
+      var add = new Result(
+        "Add new todo",
+        "Add a new item to your todo list",
+        "todo",
+        "add",
+        "list"
+      );
+
+      add.iconImage = true;
+      add.needsConfirmation = true;
+      add.confirmationType = "text";
+
+      this.results.push(add);
+
+      var show = new Result(
+        "Show archived todos",
+        "Show all the completed todos",
+        "todo",
+        "archive",
+        "list"
+      );
+
+      show.iconImage = true;
+
+      this.results.push(show);
     }
 
     this.widgets.forEach((widget) => {
       if (this.searchType == widget.type) {
         this.results.push(widget);
       }
-    })
+    });
 
     if (this.searchType == "extension") {
       let extensions = await chrome.management.getAll();
@@ -1051,7 +1109,18 @@ export class Results {
         <div class="result ${
           ele.type
         }" data-index="${index++}" style="--delay: ${index / 30}s;">
-          <img src="${ele.imageURL == '' ? "./transparent.png" : ele.imageURL}" class="icon" title="${ele.imageURL}">
+          <img src="${
+            ele.imageURL == "" || ele.iconImage
+              ? "./transparent.png"
+              : ele.imageURL
+          }" class="icon" title="${ele.imageURL}" style="${
+        ele.iconImage ? "display: none" : ""
+      }">
+          <div class="icon material-symbols-rounded" title="${
+            ele.type
+          }" style="${ele.iconImage ? "" : "display: none"}">${
+        ele.imageURL
+      }</div>
           <div class="text"><span title="${ele.title}">${
         ele.title
       }</span><div class="desc" title="${ele.description}">${

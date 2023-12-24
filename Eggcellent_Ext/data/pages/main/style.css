@@ -1,11 +1,11 @@
 @font-face {
   font-family: Maax;
-  src: url("../../../../shared/Maax.woff") format("woff");
+  src: url("Maax.woff") format("woff");
   font-display: swap;
 }
 @font-face {
   font-family: Inter;
-  src: url("../../../../shared/Inter.woff2") format("woff2");
+  src: url("Inter.woff2") format("woff2");
   font-display: swap;
 }
 * {
@@ -143,6 +143,8 @@ html.default-theme .preserve-position .search-container .search-results .result 
   display: grid;
   place-items: center;
   text-transform: uppercase;
+  color: #4c4f6b;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24 !important;
 }
 html.default-theme .preserve-position .search-container .search-results .result .text {
   font-size: 16px;
@@ -576,6 +578,8 @@ html.purple-theme .preserve-position .search-container .search-results .result .
   display: grid;
   place-items: center;
   text-transform: uppercase;
+  color: #4c4f6b;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24 !important;
 }
 html.purple-theme .preserve-position .search-container .search-results .result .text {
   font-size: 16px;

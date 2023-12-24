@@ -4,13 +4,13 @@
 
 @font-face {
   font-family: Maax;
-  src: url("../../../../shared/Maax.woff") format("woff");
+  src: url("Maax.woff") format("woff");
   font-display: swap;
 }
 
 @font-face {
   font-family: Inter;
-  src: url("../../../../shared/Inter.woff2") format("woff2");
+  src: url("Inter.woff2") format("woff2");
   font-display: swap;
 }
 
@@ -190,6 +190,9 @@
               display: grid;
               place-items: center;
               text-transform: uppercase;
+
+              color: $icon-color;
+              font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24 !important;
             }
 
             .text {
