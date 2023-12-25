@@ -174,6 +174,8 @@ export class Action {
           chrome.tabs.move(focusedTab.id, { index: 0 });
         }
       });
+
+      return false;
     };
     
     return action;

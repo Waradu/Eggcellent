@@ -13,15 +13,17 @@ const sortWidget = new Widget(
   "command",
   "",
   "sort",
-  actions.sort
 );
+
+sortWidget.runAction = actions.sort();
 
 var copyResult = new MenuItem(
   "Sort tabs",
   "sort",
-  "default",
-  actions.sort
+  "default"
 );
+
+copyResult.runAction = actions.sort();
 
 sortWidget.contextMenu.append(copyResult);
 

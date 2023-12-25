@@ -9,13 +9,14 @@ export class ContextMenu {
 }
 
 export class MenuItem {
-  constructor(title, icon, type, action) {
+  constructor(title, icon, type, runAction) {
     this.title = title;
     this.icon = icon;
     this.type = type;
-    this.action = action;
+    this.runAction = runAction;
     this.enabled = true;
     this.needsConfirmation = false;
     this.inputType = "none"; // Other options are "password", "email", "number" and "paragraph" !! Currently not implemented !!
+    this.confirmationType = ""
   }
 }

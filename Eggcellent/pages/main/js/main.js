@@ -1,5 +1,12 @@
 import { ContextMenu, MenuItem } from "./contextMenu.js";
-import { Search, Widget, TabWidget, HistoryWidget, BookmarkWidget, ExtensionWidget } from "./widget.js";
+import {
+  Search,
+  Widget,
+  TabWidget,
+  HistoryWidget,
+  BookmarkWidget,
+  ExtensionWidget,
+} from "./widget.js";
 import { Action } from "./action.js";
 
 const jsConfetti = new JSConfetti();
@@ -14,7 +21,7 @@ export class Main {
     this.fuseResults = [];
     this.resultsCount = 0;
 
-    this.confettiCount = 1;
+    this.confettiCount = 5;
     this.confettiSize = 5;
 
     this.selectedElement;
@@ -107,6 +114,100 @@ export class Main {
     });
 
     this.searchTag.focus();
+  }
+
+  async handleEnterKey(event) {
+    if (event.key != "Enter") return;
+    event.preventDefault();
+
+    if (
+      !this.inContextMenu &&
+      !this.popupOpened &&
+      this.term != "" &&
+      this.beforeTag.innerHTML == ""
+    ) {
+      window.location = `https://www.google.com/search?q=${encodeURIComponent(
+        this.term
+      )}`;
+    }
+
+    if (event.shiftKey) {
+      this.showContextMenu();
+      return;
+    }
+
+    if (this.popupOpened) {
+      this.handleAction();
+      return;
+    }
+
+    var item = {};
+
+    if (this.inContextMenu) {
+      item = this.selectedElement.contextMenu.items[this.contextMenuIndex];
+    } else {
+      item = this.selectedElement;
+    }
+
+    if (item.needsConfirmation) {
+      this.showConfirm(item);
+    } else {
+      this.handleAction();
+    }
+  }
+
+  showConfirm(item) {
+    var overlay = document.getElementById("overlay");
+
+    overlay.style.display = "flex";
+
+    this.popupOpened = true;
+  }
+
+  async handleAction() {
+    var item = {};
+
+    if (this.inContextMenu) {
+      item = this.selectedElement.contextMenu.items[this.contextMenuIndex];
+    } else {
+      item = this.selectedElement;
+    }
+
+    this.runAction(item);
+  }
+
+  async runAction(item) {
+    var reload = false;
+
+    if (item.confirmationType == "") {
+      reload = await item.runAction(this.selectedElement);
+    } else if (item.confirmationType == "text") {
+      var text = document.getElementById("text-input");
+      reload = await item.runAction(this.selectedElement, text.value);
+      text.value = "";
+    }
+
+    if (this.inContextMenu) {
+      this.showContextMenu();
+    }
+
+    this.closePopup();
+
+    if (reload) {
+      var cm = document.getElementById("cm");
+      cm.style.display = "none";
+      this.inContextMenu = false;
+      this.contextMenuIndex = 0;
+
+      this.search();
+    }
+  }
+
+  closePopup() {
+    var overlay = document.getElementById("overlay");
+    overlay.style.display = "none";
+
+    this.popupOpened = false;
   }
 
   addSearchType(s) {
@@ -617,7 +718,11 @@ export class Main {
     }
 
     if (this.searchType == "all" || this.searchType == "history") {
-      var result = await chrome.history.search({ text: "", maxResults: 50 });
+      var result = await chrome.history.search({
+        text: "",
+        maxResults: 50,
+        startTime: 100 * 60 * 60 * 60 * 24 * 30,
+      });
       result = result.filter(
         (item) =>
           !this.patternsToExclude.some((pattern) => item.url.includes(pattern))
@@ -717,13 +822,13 @@ export class Main {
       command.runAction = () => {
         jsConfetti.addConfetti({
           confettiRadius: this.confettiSize,
-          confettiNumber: 400 + 100 * this.confettiCount,
+          confettiNumber: 100 * this.confettiCount,
         });
-        if (this.confettiCount < 5) {
+        if (this.confettiCount < 10) {
           this.confettiCount += 1;
         }
-        if (this.confettiSize < 1) {
-          this.confettiSize += 0.1;
+        if (this.confettiSize < 7) {
+          this.confettiSize += .5;
         }
       };
 
@@ -983,7 +1088,7 @@ export class Main {
         this.selectedElement = this.fuseResults[this.selectedIndex];
         result[this.selectedIndex].classList.add("selected-result");
         this.selectedElement = this.fuseResults[this.selectedIndex];
-        await this.useResult();
+        await this.handleAction();
       });
     });
   }
