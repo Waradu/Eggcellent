@@ -1,8 +1,10 @@
-import { ContextMenu, MenuItem, MenuItemAction } from "./contextMenu.js";
+import { ContextMenu, MenuItem } from "./contextMenu.js";
+import { Search, Widget, TabWidget, HistoryWidget, BookmarkWidget, ExtensionWidget } from "./widget.js";
+import { Action } from "./action.js";
 
 const jsConfetti = new JSConfetti();
 
-export class Results {
+export class Main {
   constructor() {
     this.index = 0;
     this.oldIndex = -1;
@@ -91,7 +93,6 @@ export class Results {
     document.addEventListener("keydown", async (event) => {
       this.handleNavigationKeys(event);
       this.handleSearchKeys(event);
-      this.handleDelKey(event);
       this.handleEnterKey(event);
     });
 
@@ -114,195 +115,6 @@ export class Results {
 
   addWidget(w) {
     this.widgets.push(w);
-  }
-
-  async handleDelKey(event) {
-    return;
-    if (event.key != "Delete" || this.resultsCount <= 0 || this.popupOpened)
-      return;
-    if (this.selectedIndex != -1) {
-      var result = this.selectedElement;
-
-      if (result.type == "history") {
-        chrome.history.deleteUrl({ url: result.description });
-      }
-
-      if (result.type == "bookmark") {
-        chrome.bookmarks.remove(result.ID);
-      }
-
-      if (result.type == "tab") {
-        chrome.tabs.remove(result.ID);
-      }
-    }
-    await this.search(true, true);
-  }
-
-  async handleEnterKey(event) {
-    if (event.key != "Enter") return;
-    event.preventDefault();
-
-    if (this.popupOpened) {
-      var item = this.selectedElement.contextMenu.items[this.contextMenuIndex];
-
-      var reload = await item.action(this.selectedElement);
-
-      if (reload) {
-        var cm = document.getElementById("cm");
-        cm.style.display = "none";
-        this.inContextMenu = false;
-        this.contextMenuIndex = 0;
-
-        this.search();
-      }
-
-      var overlay = document.getElementById("overlay");
-      overlay.style.display = "none";
-
-      var confirm = document.getElementById("confirm");
-      var cancel = document.getElementById("cancel");
-
-      var clonedElement = confirm.cloneNode(true);
-      confirm.parentNode.replaceChild(clonedElement, confirm);
-
-      clonedElement = cancel.cloneNode(true);
-      cancel.parentNode.replaceChild(clonedElement, cancel);
-
-      this.popupOpened = false;
-    } else {
-      if (this.selectedIndex != -1 && this.resultsCount > 0) {
-        if (event.shiftKey) {
-          this.showContextMenu();
-        } else {
-          var item =
-            this.selectedElement.contextMenu.items[this.contextMenuIndex];
-          if (this.inContextMenu) {
-            if (item.needsConfirmation) {
-              this.confirm(item);
-            } else {
-              var reload = await item.action(this.selectedElement);
-              if (reload) {
-                var cm = document.getElementById("cm");
-                cm.style.display = "none";
-                this.inContextMenu = false;
-                this.contextMenuIndex = 0;
-
-                this.search();
-              } else {
-                this.showContextMenu();
-              }
-            }
-          } else {
-            if (item.needsConfirmation) {
-              this.confirm(item);
-            } else {
-              await this.useResult();
-            }
-          }
-        }
-      } else if (this.searchTag.value != "" && this.beforeTag.innerHTML == "") {
-        if (this.isURL(document.getElementById("search").value)) {
-          window.location = this.formatURL(
-            encodeURIComponent(document.getElementById("search").value)
-          );
-        } else {
-          window.location = `https://www.google.com/search?q=${encodeURIComponent(
-            document.getElementById("search").value
-          )}`;
-        }
-      }
-    }
-  }
-
-  confirm(item) {
-    if (item.confirmationType == "text") {
-      var overlay = document.getElementById("tex-overlay");
-      var label = document.getElementById("text-input-label");
-
-      overlay.style.display = "flex";
-      label.innerHTML = item.text;
-
-      this.popupOpened = true;
-    } else {
-      var overlay = document.getElementById("overlay");
-      var confirm = document.getElementById("confirm");
-      var cancel = document.getElementById("cancel");
-
-      overlay.style.display = "flex";
-
-      this.popupOpened = true;
-
-      var runEvent = confirm.addEventListener("click", async () => {
-        await item.action(this.selectedElement);
-        overlay.style.display = "none";
-        confirm.removeEventListener("click", runEvent);
-        cancel.removeEventListener("click", cancelEvent);
-        this.popupOpened = false;
-
-        this.search();
-        this.showContextMenu();
-      });
-
-      var cancelEvent = cancel.addEventListener("click", () => {
-        overlay.style.display = "none";
-        cancel.removeEventListener("click", cancelEvent);
-        confirm.removeEventListener("click", runEvent);
-        this.popupOpened = false;
-
-        this.search();
-      });
-    }
-  }
-
-  isURL(text) {
-    var urlPattern =
-      /^(https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{2,5})?([a-zA-Z0-9\/#?=.&_\-]*)$/;
-
-    return urlPattern.test(text);
-  }
-
-  formatURL(text) {
-    if (!/^https?:\/\//i.test(text)) {
-      text = "https://" + text;
-    }
-    return text;
-  }
-
-  async useResult() {
-    var result = this.selectedElement;
-
-    if (result.type == "tab") {
-      const tabGroups = await chrome.tabGroups.query({});
-
-      var tab = await chrome.tabs.get(parseInt(result.ID));
-
-      chrome.windows.update(tab.windowId, {
-        focused: true,
-      });
-
-      chrome.tabs.update(parseInt(result.ID), { active: true });
-
-      var tab = await chrome.tabs.get(parseInt(result.ID));
-
-      for (const tabGroup of tabGroups) {
-        if (tabGroup.id === tab.groupId) continue;
-        await chrome.tabGroups.update(tabGroup.id, {
-          collapsed: tabGroup.collapsed,
-        });
-      }
-
-      window.close();
-    } else if (result.type == "math") {
-      navigator.clipboard.writeText(result.title);
-    } else if (
-      result.type == "link" ||
-      result.type == "history" ||
-      result.type == "bookmark"
-    ) {
-      window.location = result.URL;
-    } else {
-      await result.runAction(result);
-    }
   }
 
   showContextMenu() {
@@ -665,7 +477,7 @@ export class Results {
   async setResults() {
     this.results = [];
 
-    var action = new MenuItemAction();
+    var action = new Action();
 
     if (this.searchType == "all" || this.searchType == "tab") {
       var result = await chrome.tabs.query({});
@@ -674,7 +486,7 @@ export class Results {
           !this.patternsToExclude.some((pattern) => item.url.includes(pattern))
       );
       result.forEach((tab) => {
-        var tabObj = new TabResult(
+        var tabObj = new TabWidget(
           tab.title,
           tab.url,
           "tab",
@@ -749,7 +561,7 @@ export class Results {
                 if (child.url) {
                   var image = `https://www.google.com/s2/favicons?domain=${child.url}&sz=128`;
 
-                  var bookmarkObj = new BookmarkResult(
+                  var bookmarkObj = new BookmarkWidget(
                     child.title,
                     child.url,
                     "bookmark",
@@ -813,7 +625,7 @@ export class Results {
       result.forEach((history) => {
         var image = `https://www.google.com/s2/favicons?domain=${history.url}&sz=128`;
 
-        var historyObj = new HistoryResult(
+        var historyObj = new HistoryWidget(
           history.title,
           history.url,
           "history",
@@ -871,18 +683,13 @@ export class Results {
     }
 
     if (this.searchType == "math") {
-      var mathw = new Result(
+      var extension = new Widget(
         math.evaluate(this.term) || "Error",
         `Solved: ${this.term}`,
         "math",
         "https://cdn-icons-png.flaticon.com/512/212/212376.png",
         "calculate"
       );
-
-      mathw.runAction = (item) => {
-        navigator.clipboard.writeText(item.title);
-        return false;
-      }
 
       var copyResult = new MenuItem(
         "Copy Result",
@@ -893,13 +700,13 @@ export class Results {
           return false;
         }
       );
-      mathw.contextMenu.append(copyResult);
+      extension.contextMenu.append(copyResult);
 
-      this.results.push(mathw);
+      this.results.push(extension);
     }
 
     if (this.searchType == "command") {
-      var command = new Result(
+      var command = new Widget(
         "Confetti",
         "Accomplished something? Celebrate with confetti!",
         "command",
@@ -924,7 +731,7 @@ export class Results {
     }
 
     if (this.searchType == "todo") {
-      var add = new Result(
+      var add = new Widget(
         "Add new todo",
         "Add a new item to your todo list",
         "todo",
@@ -938,7 +745,7 @@ export class Results {
 
       this.results.push(add);
 
-      var show = new Result(
+      var show = new Widget(
         "Show archived todos",
         "Show all the completed todos",
         "todo",
@@ -968,7 +775,7 @@ export class Results {
             icon = ext.icons[ext.icons.length - 1].url;
           } catch {}
 
-          var extension = new ExtensionResult(
+          var extension = new ExtensionWidget(
             ext.name,
             ext.description,
             "extension",
@@ -1082,17 +889,6 @@ export class Results {
       if (b.favorite && !a.favorite) {
         return 1;
       }
-
-      /* const nameA = a.title.toLowerCase();
-      const nameB = b.title.toLowerCase();
-
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      return 0; */
     });
   }
 
@@ -1116,7 +912,7 @@ export class Results {
         }" data-index="${index++}" style="--delay: ${index / 30}s;">
           <img src="${
             ele.imageURL == "" || ele.iconImage
-              ? "./transparent.png"
+              ? "./assets/transparent.png"
               : ele.imageURL
           }" class="icon" title="${ele.imageURL}" style="${
         ele.iconImage ? "display: none" : ""

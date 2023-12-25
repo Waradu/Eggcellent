@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "version": "0.3.1",
   "background": {
-    "service_worker": "data/background/service_worker.js"
+    "service_worker": "background/service_worker.js"
   },
   "permissions": [
     "storage",
@@ -16,17 +16,12 @@
     "activeTab"
   ],
   "icons": {
-    "512": "data/assets/icons/512x512.png"
-  },
-  "action": {
-    "default_title": "Open Quick Menu",
-    "default_popup": "data/pages/popup/index.html"
+    "512": "assets/icons/512x512.png"
   },
   "description": "A free search bar to manage your browser. Eggspand your productivity and eggsplore new possibilities.",
   "offline_enabled": true,
-  "options_page": "data/pages/options/index.html",
   "chrome_url_overrides": {
-    "newtab": "data/pages/main/index.html"
+    "newtab": "pages/main/index.html"
   },
   "commands": {
     "open_search_page": {
