@@ -1,7 +1,7 @@
 {
   "name": "Eggcellent",
   "manifest_version": 3,
-  "version": "0.3.1",
+  "version": "0.4.0",
   "background": {
     "service_worker": "background/service_worker.js"
   },
