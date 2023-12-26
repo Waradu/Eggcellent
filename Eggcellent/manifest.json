@@ -6,14 +6,11 @@
     "service_worker": "background/service_worker.js"
   },
   "permissions": [
-    "storage",
     "tabs",
     "tabGroups",
     "bookmarks",
     "history",
-    "management",
-    "scripting",
-    "activeTab"
+    "management"
   ],
   "icons": {
     "512": "assets/icons/512x512.png"

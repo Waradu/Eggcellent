@@ -72,7 +72,7 @@ export class HistoryWidget extends Widget {
     this.ID = ID;
 
     this.runAction = async (item) => {
-      window.location = result.URL;
+      window.location = item.URL;
       return false;
     }
   }
@@ -86,7 +86,7 @@ export class BookmarkWidget extends Widget {
     this.ID = ID;
 
     this.runAction = async (item) => {
-      window.location = result.URL;
+      window.location = item.URL;
       return false;
     }
   }
@@ -99,7 +99,7 @@ export class ExtensionWidget extends Widget {
     this.ID = ID;
 
     this.runAction = async (item) => {
-      window.location = result.URL;
+      window.location = item.URL;
       return false;
     }
   }

@@ -611,6 +611,11 @@ html {
     bottom: 20px;
     border-radius: 8px;
     padding: 10px;
+    transition: right .2s ease-in-out;
+
+    &.closed {
+      right: -450px;
+    }
 
     .header {
       display: flex;
@@ -775,4 +780,8 @@ html {
   to {
     opacity: 1;
   }
+}
+
+*[hidden] {
+  display: none !important;
 }

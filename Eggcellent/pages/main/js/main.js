@@ -75,12 +75,12 @@ export class Main {
         type: "extension",
         disableFuse: false,
       },
-      {
+      /* {
         key: "<",
         text: "Todo:",
         type: "todo",
         disableFuse: true,
-      },
+      }, */
       {
         key: "+",
         text: "Links:",
@@ -104,12 +104,20 @@ export class Main {
       threshold: 0.4,
       keys: ["title", "description"],
     };
+    
+    this.help = document.getElementById("help-overlay");
+    this.helpClose = document.getElementById("help-close");
+    this.helpOpen = document.getElementById("help-open");
 
     this.searchTag.addEventListener("input", async (event) => {
       await this.search();
     });
 
     document.addEventListener("keydown", async (event) => {
+      if (event.altKey && event.key === '?') {
+        this.help.classList.toggle("closed");
+        return;
+      }
       this.handleNavigationKeys(event);
       this.handleSearchKeys(event);
       this.handleEnterKey(event);
@@ -124,6 +132,14 @@ export class Main {
           document.getElementById("search").value
         )}`;
     });
+
+    this.helpClose.addEventListener("click", () => {
+      this.help.classList.add("closed");
+    })
+
+    this.helpOpen.addEventListener("click", () => {
+      this.help.classList.toggle("closed");
+    })
 
     this.searchTag.focus();
   }

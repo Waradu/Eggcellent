@@ -78,10 +78,10 @@
       <label for="text-input" id="text-input-label">Input:</label>
       <input type="text" name="text-input" id="text-input" />
     </div>
-    <div class="help" id="help-overlay">
+    <div class="help closed" id="help-overlay">
       <div class="header">
         <div class="title">Eggcellent - Help</div>
-        <div class="material-symbols-rounded close">close</div>
+        <div class="material-symbols-rounded close" id="help-close">close</div>
       </div>
       <div class="group">
         <div class="group-header">
@@ -133,7 +133,7 @@
             <div class="key">=</div>
           </div>
         </div>
-        <div class="group-item">
+        <div class="group-item" hidden>
           <div class="text">Manage Todos</div>
           <div class="desc">
             <div class="key">&lt;</div>
@@ -256,7 +256,7 @@
         </div>
       </div>
     </div>
-    <a href="https://waradu.dev/egg" target="_blank" class="logo"></a>
+    <div id="help-open" class="logo" title="Help"></div>
     <script type="module" src="script.js"></script>
   </body>
 </html>

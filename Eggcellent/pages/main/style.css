@@ -492,6 +492,10 @@ html .help {
   bottom: 20px;
   border-radius: 8px;
   padding: 10px;
+  transition: right 0.2s ease-in-out;
+}
+html .help.closed {
+  right: -450px;
 }
 html .help .header {
   display: flex;
@@ -642,4 +646,7 @@ html .help .group .group-item .desc a:hover {
   to {
     opacity: 1;
   }
+}
+*[hidden] {
+  display: none !important;
 }/*# sourceMappingURL=style.css.map */
