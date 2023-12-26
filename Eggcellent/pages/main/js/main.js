@@ -104,17 +104,24 @@ export class Main {
       threshold: 0.4,
       keys: ["title", "description"],
     };
-    
+
     this.help = document.getElementById("help-overlay");
-    this.helpClose = document.getElementById("help-close");
-    this.helpOpen = document.getElementById("help-open");
+    this.helpToggle = document.getElementById("help-toggle");
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const helpOpen = urlParams.get("help");
+
+    if (helpOpen == "true") {
+      this.help.classList.remove("closed");
+    }
 
     this.searchTag.addEventListener("input", async (event) => {
       await this.search();
     });
 
     document.addEventListener("keydown", async (event) => {
-      if (event.altKey && event.key === '?') {
+      if (event.altKey && event.key === "?") {
         this.help.classList.toggle("closed");
         return;
       }
@@ -133,15 +140,15 @@ export class Main {
         )}`;
     });
 
-    this.helpClose.addEventListener("click", () => {
-      this.help.classList.add("closed");
-    })
-
-    this.helpOpen.addEventListener("click", () => {
+    this.helpToggle.addEventListener("click", () => {
       this.help.classList.toggle("closed");
-    })
+    });
 
     this.searchTag.focus();
+
+    document.body.style.transition = "width .2s ease-in-out";
+    this.help.style.transition = "right 0.2s ease-in-out, filter .2s";
+    this.helpToggle.style.transition = ".2s ease-in-out";
   }
 
   async handleEnterKey(event) {
@@ -845,13 +852,13 @@ export class Main {
         "http://wallpaperswide.com/download/shadow_of_the_tomb_raider_2018_puzzle_video_game-wallpaper-7680x4800.jpg" +
         "?n=" +
         Math.random();
-      
+
       var startTime, endTime;
       var downloadSize = 5616998;
       var download = new Image();
       var roundedDecimals = 2;
       var bytesInAKilobyte = 1024;
-    
+
       const speed = (bitsPerSecond) => {
         var KBps = (bitsPerSecond / bytesInAKilobyte).toFixed(roundedDecimals);
         if (KBps <= 1) return { value: bitsPerSecond, units: "Bps" };
@@ -859,15 +866,15 @@ export class Main {
         if (MBps <= 1) return { value: KBps, units: "KBps" };
         else return { value: MBps, units: "MBps" };
       };
-    
+
       download.onload = () => {
         endTime = new Date().getTime();
-    
-        var duration = (endTime -  (startTime + 50)) / 1000;
+
+        var duration = (endTime - (startTime + 50)) / 1000;
         var bitsLoaded = downloadSize * 8;
         var speedBps = (bitsLoaded / duration).toFixed(roundedDecimals);
         var displaySpeed = speed(speedBps);
-    
+
         var extension = new Widget(
           "Upload: " + displaySpeed.value + " " + displaySpeed.units,
           `Tested with 5.36MB`,
@@ -875,12 +882,12 @@ export class Main {
           "https://cdn-icons-png.flaticon.com/512/212/212376.png",
           "calculate"
         );
-    
+
         this.results.push(extension);
 
-        this.search(true, false, true)
+        this.search(true, false, true);
       };
-    
+
       startTime = new Date().getTime();
       download.src = imageAddr;
     }

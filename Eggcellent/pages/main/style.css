@@ -476,6 +476,37 @@ html .overlay Button .key {
   right: -10px;
   bottom: -10px;
 }
+html .help-arrow {
+  position: absolute;
+  right: 450px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 15px;
+}
+html .help-arrow .harrow {
+  z-index: 999;
+  background-color: #2C2D3C;
+  width: 6px;
+  height: 20px;
+  border-radius: 3px;
+  transition: 0.2s;
+  margin-bottom: -2px;
+  transform-origin: center bottom;
+}
+html .help-arrow .harrow:last-child {
+  margin-bottom: 0px;
+  margin-top: -2px;
+  transform-origin: center top;
+}
+html .help-arrow:hover .harrow {
+  background-color: #4C4F6B;
+  margin-right: -3px;
+  rotate: -15deg;
+}
+html .help-arrow:hover .harrow:last-child {
+  rotate: 15deg;
+}
 html .help {
   position: absolute;
   z-index: 999;
@@ -492,10 +523,9 @@ html .help {
   bottom: 20px;
   border-radius: 8px;
   padding: 10px;
-  transition: right 0.2s ease-in-out;
 }
 html .help.closed {
-  right: -450px;
+  right: -420px;
 }
 html .help .header {
   display: flex;
@@ -507,16 +537,16 @@ html .help .header {
   align-self: stretch;
 }
 html .help .header .title {
-  color: #d1d3e1;
+  color: #eeeffc;
   font-family: Inter;
-  font-size: 20px;
+  font-size: 21px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
 }
 html .help .header .close {
   color: #858699;
-  cursor: pointer;
+  font-size: 20px;
 }
 html .help .group {
   display: flex;
@@ -579,6 +609,7 @@ html .help .group .group-item {
   justify-content: space-between;
   align-items: center;
   align-self: stretch;
+  height: 31px;
 }
 html .help .group .group-item .text {
   color: #858699;
@@ -627,6 +658,22 @@ html .help .group .group-item .desc a {
 }
 html .help .group .group-item .desc a:hover {
   color: #d1d3e1;
+}
+html body:has(.closed) .help-arrow {
+  right: 10px;
+}
+html body:has(.closed) .help-arrow:hover .harrow {
+  margin-right: 3px;
+  rotate: 15deg;
+}
+html body:has(.closed) .help-arrow:hover .harrow:last-child {
+  rotate: -15deg;
+}
+html body:has(.help-arrow:hover) .help {
+  filter: brightness(80%);
+}
+html body:has(.help:not(.closed)) {
+  width: calc(100% - 440px);
 }
 
 @keyframes show {

@@ -21,3 +21,11 @@ chrome.commands.onCommand.addListener(async (command) => {
     }
   }
 });
+
+chrome.runtime.onInstalled.addListener(function (object) {
+  let internalUrl = chrome.runtime.getURL("pages/main/index.html?help=true");
+
+  if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+      chrome.tabs.create({ url: internalUrl });
+  }
+});
