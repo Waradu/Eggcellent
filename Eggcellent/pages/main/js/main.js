@@ -81,6 +81,18 @@ export class Main {
         type: "todo",
         disableFuse: true,
       },
+      {
+        key: "+",
+        text: "Links:",
+        type: "link",
+        disableFuse: true,
+      },
+      {
+        key: "$",
+        text: "Speedtest...",
+        type: "speed",
+        disableFuse: true,
+      },
     ];
 
     this.widgets = [];
@@ -124,7 +136,9 @@ export class Main {
       !this.inContextMenu &&
       !this.popupOpened &&
       this.term != "" &&
-      this.beforeTag.innerHTML == ""
+      this.beforeTag.innerHTML == "" &&
+      this.selectedIndex == -1 &&
+      this.index == 0
     ) {
       window.location = `https://www.google.com/search?q=${encodeURIComponent(
         this.term
@@ -312,7 +326,7 @@ export class Main {
       return;
 
     if (
-      /^[0-9a-zA-Z.,\-\<\>\=]$/.test(event.key) &&
+      /^[0-9a-zA-Z.,\-\<\>\=\:\;\$\+\§]$/.test(event.key) &&
       document.activeElement !== this.searchTag
     ) {
       event.preventDefault();
@@ -582,10 +596,10 @@ export class Main {
 
     if (this.searchType == "all" || this.searchType == "tab") {
       var result = await chrome.tabs.query({});
-      result = result.filter(
+      /* result = result.filter(
         (item) =>
           !this.patternsToExclude.some((pattern) => item.url.includes(pattern))
-      );
+      ); */
       result.forEach((tab) => {
         var tabObj = new TabWidget(
           tab.title,
@@ -810,6 +824,51 @@ export class Main {
       this.results.push(extension);
     }
 
+    if (this.searchType === "speed") {
+      var imageAddr =
+        "http://wallpaperswide.com/download/shadow_of_the_tomb_raider_2018_puzzle_video_game-wallpaper-7680x4800.jpg" +
+        "?n=" +
+        Math.random();
+      
+      var startTime, endTime;
+      var downloadSize = 5616998;
+      var download = new Image();
+      var roundedDecimals = 2;
+      var bytesInAKilobyte = 1024;
+    
+      const speed = (bitsPerSecond) => {
+        var KBps = (bitsPerSecond / bytesInAKilobyte).toFixed(roundedDecimals);
+        if (KBps <= 1) return { value: bitsPerSecond, units: "Bps" };
+        var MBps = (KBps / bytesInAKilobyte).toFixed(roundedDecimals);
+        if (MBps <= 1) return { value: KBps, units: "KBps" };
+        else return { value: MBps, units: "MBps" };
+      };
+    
+      download.onload = () => {
+        endTime = new Date().getTime();
+    
+        var duration = (endTime - startTime) / 1000;
+        var bitsLoaded = downloadSize * 8;
+        var speedBps = (bitsLoaded / duration).toFixed(roundedDecimals);
+        var displaySpeed = speed(speedBps);
+    
+        var extension = new Widget(
+          displaySpeed.value + " " + displaySpeed.units,
+          `Tested with 5.36MB`,
+          "speed",
+          "https://cdn-icons-png.flaticon.com/512/212/212376.png",
+          "calculate"
+        );
+    
+        this.results.push(extension);
+
+        this.search(true, false, true)
+      };
+    
+      startTime = new Date().getTime();
+      download.src = imageAddr;
+    }
+
     if (this.searchType == "command") {
       var command = new Widget(
         "Confetti",
@@ -828,7 +887,7 @@ export class Main {
           this.confettiCount += 1;
         }
         if (this.confettiSize < 7) {
-          this.confettiSize += .5;
+          this.confettiSize += 0.5;
         }
       };
 
@@ -861,6 +920,44 @@ export class Main {
       show.iconImage = true;
 
       this.results.push(show);
+    }
+
+    if (this.searchType == "link") {
+      var yt = new Widget(
+        "Waradu - Youtube",
+        "Subscribe to my youtube",
+        "link",
+        "https://avatars.githubusercontent.com/u/89935135?v=4",
+        "link"
+      );
+
+      yt.runAction = action.openLink("https://www.youtube.com/@waradu");
+
+      this.results.push(yt);
+
+      var gh = new Widget(
+        "Waradu - Github",
+        "See my projects in github",
+        "link",
+        "https://avatars.githubusercontent.com/u/89935135?v=4",
+        "link"
+      );
+
+      gh.runAction = action.openLink("https://github.com/Waradu/");
+
+      this.results.push(gh);
+
+      var egg = new Widget(
+        "Eggcellent - Github",
+        "Star eggcellent github repo",
+        "link",
+        "../../../assets/icons/512x512.png",
+        "link"
+      );
+
+      egg.runAction = action.openLink("https://github.com/Waradu/Eggcellent");
+
+      this.results.push(egg);
     }
 
     this.widgets.forEach((widget) => {
@@ -1015,7 +1112,7 @@ export class Main {
         <div class="result ${
           ele.type
         }" data-index="${index++}" style="--delay: ${index / 30}s;">
-          <img src="${
+          <img onerror="this.onerror=null;this.src='../assets/transparent.png'" src="${
             ele.imageURL == "" || ele.iconImage
               ? "./assets/transparent.png"
               : ele.imageURL
@@ -1045,21 +1142,35 @@ export class Main {
     });
 
     if (this.resultsCount == 0) {
-      this.resultTag.innerHTML += `
-        <div title="Error: No results found!" class="result always-select" data-index="-1" style="--delay: 0s;">
-          <div class="icon material-symbols-rounded" style="color: #ff6666;">close</div>
-          <div class="text">No results found!<div class="desc">Maybe try to use another search term!</div></div>
-          <div class="qa-icon material-symbols-rounded"></div>
-        </div>
-      `;
+      if (this.searchType != "speed") {
+        this.resultTag.innerHTML += `
+          <div title="Error: No results found!" class="result always-select" data-index="-1" style="--delay: 0s;">
+            <div class="icon material-symbols-rounded" style="color: #ff6666;">close</div>
+            <div class="text">No results found!<div class="desc">Maybe try to use another search term!</div></div>
+            <div class="qa-icon material-symbols-rounded"></div>
+          </div>
+        `;
+      } else {
+        this.resultTag.innerHTML += `
+          <div title="Testing..." class="result blue" data-index="-1" style="--delay: 0s;">
+            <div class="icon material-symbols-rounded rotate" style="color: #6666ff;">autorenew</div>
+            <div class="text">Testing...<div class="desc">This could take a while</div></div>
+          </div>
+        `;
+      }
     }
   }
 
-  async search(reset = false, resetResults = false) {
+  async search(reset = false, resetResults = false, setIndex = false) {
     this.term = this.searchTag.value;
 
     if (!reset) {
       await this.setResults();
+      this.selectedIndex = -1;
+      this.index = 0;
+    }
+
+    if (setIndex) {
       this.selectedIndex = -1;
       this.index = 0;
     }

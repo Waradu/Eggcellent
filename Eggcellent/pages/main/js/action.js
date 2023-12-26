@@ -11,6 +11,18 @@ export class Action {
     return action;
   }
 
+  openLink(link, newTab = false) {
+    var action = (item) => {
+      if (newTab) {
+        window.open(link, "_blank");
+      } else {
+        window.location = link;
+      }
+      return true;
+    };
+    return action;
+  }
+
   copyDescToClipboard() {
     var action = (item) => {
       navigator.clipboard.writeText(item.description);
