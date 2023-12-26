@@ -31,6 +31,7 @@ $tabs-active-color: #2c2d3c;
 $tabs-active-shadow: 0px 2px 4px #0000001a;
 $tabs-active-border: 1px solid #313248;
 
+$popup-background: #20212e;
 $popup-color: #242631;
 $popup-opaque-color: #1d1e2b7f;
 $popup-hover-color: #7c7ca320;
@@ -590,6 +591,167 @@ html {
         position: absolute;
         right: -10px;
         bottom: -10px;
+      }
+    }
+  }
+
+  .help {
+    position: absolute;
+    z-index: 999;
+    background-color: $popup-background;
+    box-shadow: $popup-shadow;
+    border: $popup-border;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    top: 20px;
+    width: 400px;
+    right: 20px;
+    bottom: 20px;
+    border-radius: 8px;
+    padding: 10px;
+
+    .header {
+      display: flex;
+      height: 40px;
+      padding: 10px;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      align-self: stretch;
+
+      .title {
+        color: $text-color;
+        font-family: Inter;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+      }
+
+      .close {
+        color: $text-color-dark;
+        cursor: pointer;
+      }
+    }
+
+    .group {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      align-self: stretch;
+
+      .group-header {
+        display: flex;
+        padding: 10px;
+        justify-content: space-between;
+        align-items: center;
+        align-self: stretch;
+
+        .text {
+          color: $text-color;
+          font-family: Inter;
+          font-size: 15px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: normal;
+        }
+
+        .desc {
+          color: $text-color-dark;
+          font-family: Inter;
+          font-size: 13px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+
+          .key {
+            align-items: center;
+            background: $button-color;
+            border: 0;
+            border-radius: 3px;
+            border: $button-border;
+            box-shadow: $button-shadow !important;
+            color: $text-color-dark;
+            display: flex;
+            justify-content: center;
+            padding: 4px;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            box-sizing: border-box;
+            width: max-content;
+            position: relative;
+            font-size: 11px;
+            transition: 0.2s;
+            font-weight: 500;
+            height: 22px;
+          }
+        }
+      }
+
+      .group-item {
+        display: flex;
+        padding: 5px 10px;
+        justify-content: space-between;
+        align-items: center;
+        align-self: stretch;
+
+        .text {
+          color: #858699;
+          font-family: Inter;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: normal;
+        }
+
+        .desc {
+          color: $text-color-dark;
+          font-family: Inter;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+
+          .key {
+            align-items: center;
+            background: $button-color;
+            border: 0;
+            border-radius: 3px;
+            border: $button-border;
+            box-shadow: $button-shadow !important;
+            color: $text-color-dark;
+            display: flex;
+            justify-content: center;
+            padding: 4px;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            box-sizing: border-box;
+            width: max-content;
+            position: relative;
+            font-size: 11px;
+            transition: 0.2s;
+            font-weight: 500;
+            height: 21px;
+          }
+
+          a {
+            color: $text-color-dark;
+            transition: .2s;
+
+            &:hover {
+              color: $text-color;
+            }
+          }
+        }
       }
     }
   }

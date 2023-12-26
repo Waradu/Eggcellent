@@ -847,13 +847,13 @@ export class Main {
       download.onload = () => {
         endTime = new Date().getTime();
     
-        var duration = (endTime - startTime) / 1000;
+        var duration = (endTime -  (startTime + 50)) / 1000;
         var bitsLoaded = downloadSize * 8;
         var speedBps = (bitsLoaded / duration).toFixed(roundedDecimals);
         var displaySpeed = speed(speedBps);
     
         var extension = new Widget(
-          displaySpeed.value + " " + displaySpeed.units,
+          "Upload: " + displaySpeed.value + " " + displaySpeed.units,
           `Tested with 5.36MB`,
           "speed",
           "https://cdn-icons-png.flaticon.com/512/212/212376.png",

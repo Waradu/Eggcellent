@@ -476,6 +476,154 @@ html .overlay Button .key {
   right: -10px;
   bottom: -10px;
 }
+html .help {
+  position: absolute;
+  z-index: 999;
+  background-color: #20212e;
+  box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(82, 82, 111, 0.4392156863);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  top: 20px;
+  width: 400px;
+  right: 20px;
+  bottom: 20px;
+  border-radius: 8px;
+  padding: 10px;
+}
+html .help .header {
+  display: flex;
+  height: 40px;
+  padding: 10px;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+html .help .header .title {
+  color: #d1d3e1;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+html .help .header .close {
+  color: #858699;
+  cursor: pointer;
+}
+html .help .group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+}
+html .help .group .group-header {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+html .help .group .group-header .text {
+  color: #d1d3e1;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+html .help .group .group-header .desc {
+  color: #858699;
+  font-family: Inter;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+html .help .group .group-header .desc .key {
+  align-items: center;
+  background: #272939;
+  border: 0;
+  border-radius: 3px;
+  border: 1px solid #313248;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1019607843) !important;
+  color: #858699;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  box-sizing: border-box;
+  width: -moz-max-content;
+  width: max-content;
+  position: relative;
+  font-size: 11px;
+  transition: 0.2s;
+  font-weight: 500;
+  height: 22px;
+}
+html .help .group .group-item {
+  display: flex;
+  padding: 5px 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+html .help .group .group-item .text {
+  color: #858699;
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+html .help .group .group-item .desc {
+  color: #858699;
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+html .help .group .group-item .desc .key {
+  align-items: center;
+  background: #272939;
+  border: 0;
+  border-radius: 3px;
+  border: 1px solid #313248;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1019607843) !important;
+  color: #858699;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  box-sizing: border-box;
+  width: -moz-max-content;
+  width: max-content;
+  position: relative;
+  font-size: 11px;
+  transition: 0.2s;
+  font-weight: 500;
+  height: 21px;
+}
+html .help .group .group-item .desc a {
+  color: #858699;
+  transition: 0.2s;
+}
+html .help .group .group-item .desc a:hover {
+  color: #d1d3e1;
+}
 
 @keyframes show {
   from {
