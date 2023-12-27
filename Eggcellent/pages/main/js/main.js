@@ -879,8 +879,8 @@ export class Main {
           "Upload: " + displaySpeed.value + " " + displaySpeed.units,
           `Tested with 5.36MB`,
           "speed",
-          "https://cdn-icons-png.flaticon.com/512/212/212376.png",
-          "calculate"
+          "https://play-lh.googleusercontent.com/xKUdbWyGGv4lbYH5Fzrz-USBEKk84Aw43IPmnl9VVq4jewz4y8JrwOivPsAYCtTbDbdt",
+          "speed"
         );
 
         this.results.push(extension);
