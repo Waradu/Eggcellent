@@ -6,6 +6,7 @@
     "service_worker": "background/service_worker.js"
   },
   "permissions": [
+    "storage",
     "tabs",
     "tabGroups",
     "bookmarks",

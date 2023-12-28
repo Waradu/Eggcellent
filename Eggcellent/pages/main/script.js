@@ -29,4 +29,6 @@ sortWidget.contextMenu.append(copyResult);
 
 results.addWidget(sortWidget)
 
+results.init()
+
 results.search()

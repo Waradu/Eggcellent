@@ -85,13 +85,19 @@ export class Main {
         key: "+",
         text: "Links:",
         type: "link",
-        disableFuse: true,
+        disableFuse: false,
       },
       {
         key: "$",
         text: "Speedtest...",
         type: "speed",
         disableFuse: true,
+      },
+      {
+        key: ":",
+        text: "Settings: ",
+        type: "setting",
+        disableFuse: false,
       },
     ];
 
@@ -149,19 +155,93 @@ export class Main {
     document.body.style.transition = "width .2s ease-in-out";
     this.help.style.transition = "right 0.2s ease-in-out, filter .2s";
     this.helpToggle.style.transition = ".2s ease-in-out";
+
+    this.settings = {
+      useFuse: {
+        value: true,
+        type: "boolean",
+        name: "Use Fuse Search",
+        icon: "search",
+        description: "Use Fuse",
+        hidden: true,
+      } /* currently blocks fuse function so this.fuseResults will never be set */,
+      maxHistoryResults: {
+        value: 50,
+        type: "number",
+        name: "Max History Results",
+        icon: "history",
+        description: "Limits the maximal count of history results",
+        hidden: true,
+      },
+      blockConfirm: {
+        value: false,
+        type: "boolean",
+        name: "Block Confirmation Popup",
+        icon: "block",
+        description:
+          "Blocks the popup when for example clearing the browsing history",
+        hidden: false,
+      },
+      darkMode: {
+        value: true,
+        type: "boolean",
+        name: "Dark Mode",
+        icon: "dark_mode",
+        description: "Toggles between light and dark mode",
+        hidden: false,
+      },
+      allowSpace: {
+        value: true,
+        type: "boolean",
+        name: "Allow Space",
+        icon: "space_bar",
+        description: "allow space in addition to tabulator to activate filter",
+        hidden: false,
+      },
+      showBrowserTabs: {
+        value: true,
+        type: "boolean",
+        name: "Show Browser Tabs",
+        icon: "tabs",
+        description:
+          "Show browser tabs in list like settings or extension page",
+        hidden: true,
+      },
+      fuseThreshold: {
+        value: 0.4,
+        type: "number",
+        name: "Fuse Threshold",
+        icon: "data_thresholding",
+        description:
+          "Changes the fuse threshold do not change this unless u know what you are doing",
+        hidden: true,
+      },
+      searchOnGoogle: {
+        value: true,
+        type: "boolean",
+        name: "Search On Google",
+        icon: "search",
+        description:
+          "If nothing is selected should it search on google if you press enter",
+        hidden: false,
+      },
+    };
+  }
+
+  async init() {
+    console.log("nope");
   }
 
   async handleEnterKey(event) {
     if (event.key != "Enter") return;
     event.preventDefault();
-
     if (
       !this.inContextMenu &&
       !this.popupOpened &&
       this.term != "" &&
       this.beforeTag.innerHTML == "" &&
       this.selectedIndex == -1 &&
-      this.index == 0
+      this.settings.searchOnGoogle.value
     ) {
       window.location = `https://www.google.com/search?q=${encodeURIComponent(
         this.term
@@ -186,7 +266,7 @@ export class Main {
       item = this.selectedElement;
     }
 
-    if (item.needsConfirmation) {
+    if (item.needsConfirmation || this.settings.blockConfirm.value) {
       this.showConfirm(item);
     } else {
       this.handleAction();
@@ -230,7 +310,20 @@ export class Main {
 
     this.closePopup();
 
-    if (reload) {
+    if (reload == "x") {
+      var index = this.index;
+      var selectedIndex = this.selectedIndex;
+
+      var cm = document.getElementById("cm");
+      cm.style.display = "none";
+      this.inContextMenu = false;
+      this.contextMenuIndex = 0;
+
+      this.index = index;
+      this.selectedIndex = selectedIndex;
+
+      this.search(true, true, false);
+    } else if (reload) {
       var cm = document.getElementById("cm");
       cm.style.display = "none";
       this.inContextMenu = false;
@@ -360,7 +453,8 @@ export class Main {
     }
 
     if (
-      (event.key == " " || event.key == "Tab") &&
+      ((event.key == " " && this.settings.allowSpace.value) ||
+        event.key == "Tab") &&
       this.searchTypes.some(
         (searchType) => searchType.key === this.searchTag.value
       ) &&
@@ -757,8 +851,8 @@ export class Main {
     if (this.searchType == "all" || this.searchType == "history") {
       var result = await chrome.history.search({
         text: "",
-        maxResults: 50,
-        startTime: 100 * 60 * 60 * 60 * 24 * 30,
+        maxResults: this.settings.maxHistoryResults.value,
+        startTime: 100 * 60 * 60 * 60 * 24 * 30 * 12,
       });
       result = result.filter(
         (item) =>
@@ -983,6 +1077,42 @@ export class Main {
       this.results.push(egg);
     }
 
+    if (this.searchType == "setting") {
+      for (const [key, value] of Object.entries(this.settings)) {
+        if (value.type == "boolean" && !value.hidden) {
+          var setting = new Widget(
+            value.name,
+            value.description,
+            "setting",
+            value.icon == "" ? "settings" : value.icon,
+            value.value ? "toggle_on" : "toggle_off"
+          );
+
+          setting.iconImage = true;
+          
+          if (key == "darkMode") {
+            setting.runAction = (item) => {
+              this.settings[key].value = !this.settings[key].value;
+              if (this.settings[key].value) {
+                document.documentElement.classList.remove("light");
+              } else {
+                document.documentElement.classList.add("light");
+              }
+              return "x";
+            };
+          } else {
+            setting.runAction = (item) => {
+              this.settings[key].value = !this.settings[key].value;
+              return "x";
+            };
+          }
+
+
+          this.results.push(setting);
+        }
+      }
+    }
+
     this.widgets.forEach((widget) => {
       if (this.searchType == widget.type) {
         this.results.push(widget);
@@ -1135,7 +1265,7 @@ export class Main {
         <div class="result ${
           ele.type
         }" data-index="${index++}" style="--delay: ${index / 30}s;">
-          <img onerror="this.onerror=null;this.src='../assets/transparent.png'" src="${
+          <img src="${
             ele.imageURL == "" || ele.iconImage
               ? "./assets/transparent.png"
               : ele.imageURL
@@ -1162,6 +1292,13 @@ export class Main {
       }</div>
         </div>
       `;
+    });
+
+    Array.from(document.querySelectorAll("img.icon")).forEach((ele) => {
+      ele.onerror = () => {
+        ele.onerror = null;
+        ele.src = "../main/assets/transparent.png";
+      };
     });
 
     if (this.resultsCount == 0) {
@@ -1202,7 +1339,9 @@ export class Main {
       await this.setResults();
     }
 
-    await this.fuseSearch();
+    if (this.settings.useFuse.value) {
+      await this.fuseSearch();
+    }
     await this.setHTML();
 
     var result = document.querySelectorAll(".result");

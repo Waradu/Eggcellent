@@ -90,6 +90,14 @@ export class Action {
     return action;
   }
 
+  changeSetting(setting, value) {
+    var action = async (item) => {
+      this.settings[setting].value = value;
+      return true;
+    };
+    return action;
+  }
+
   deleteHistory() {
     var action = async (item) => {
       await chrome.history.deleteUrl({ url: item.URL });
