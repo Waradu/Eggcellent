@@ -34,6 +34,7 @@ $tabs-active-border: 1px solid #313248;
 $popup-background: #20212e;
 $popup-color: #242631;
 $popup-opaque-color: #1d1e2b7f;
+$popup-bg-color: #1a1c27;
 $popup-hover-color: #7c7ca320;
 $popup-shadow: 0px 4px 24px #00000033;
 $popup-border: 1px solid #52526f70;
@@ -84,6 +85,7 @@ $light-tabs-active-border: 1px solid #313248;
 $light-popup-background: #eaeaea;
 $light-popup-color: #eaeaea;
 $light-popup-opaque-color: #eaeaea7f;
+$light-popup-bg-color: #eef1f3;
 $light-popup-hover-color: #7c7ca320;
 $light-popup-shadow: 0px 4px 24px #00000033;
 $light-popup-border: 1px solid #38383870;
@@ -128,6 +130,7 @@ $light-button-hover-border: 1px solid #3e3e4a;
 }
 
 html {
+  --color: #181a24;
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -135,8 +138,9 @@ html {
   color: $text-color;
   min-width: 300px;
   font-family: Inter;
-
+  
   body {
+    background-color: var(--color);
     height: 100%;
     width: 100%;
     display: flex;
@@ -158,10 +162,11 @@ html {
         font-size: 40px;
         color: $bg;
         filter: brightness(150%);
+        transition: color .2s;
       }
 
       .search-container {
-        background-color: $popup-opaque-color;
+        background-color: $popup-bg-color;
         background-size: cover;
         border: $popup-border;
         box-shadow: $popup-shadow;
@@ -880,18 +885,20 @@ html {
 }
 
 html.light {
-  background-color: $light-bg;
   color: $light-text-color;
-
+  background-color: $light-bg;
+  
   body {
+    background-color: var(--color);
+
     .preserve-position {
       .header {
         color: $light-bg;
-        filter: brightness(80%);
+        filter: brightness(70%);
       }
 
       .search-container {
-        background-color: $light-popup-opaque-color;
+        background-color: $light-popup-bg-color;
         border: $light-popup-border;
         box-shadow: $light-popup-shadow;
 
@@ -1219,6 +1226,10 @@ html.light {
   to {
     opacity: 1;
   }
+}
+
+.upper {
+  text-transform: uppercase;
 }
 
 *[hidden] {

@@ -99,6 +99,12 @@ export class Main {
         type: "setting",
         disableFuse: false,
       },
+      {
+        key: "#",
+        text: "Hex: ",
+        type: "color",
+        disableFuse: true,
+      },
     ];
 
     this.widgets = [];
@@ -152,7 +158,7 @@ export class Main {
 
     this.searchTag.focus();
 
-    document.body.style.transition = "width .2s ease-in-out";
+    document.body.style.transition = "width .2s ease-in-out, background .2s";
     this.help.style.transition = "right 0.2s ease-in-out, filter .2s";
     this.helpToggle.style.transition = ".2s ease-in-out";
 
@@ -228,9 +234,7 @@ export class Main {
     };
   }
 
-  async init() {
-    console.log("nope");
-  }
+  async init() {}
 
   async handleEnterKey(event) {
     if (event.key != "Enter") return;
@@ -442,7 +446,7 @@ export class Main {
       return;
 
     if (
-      /^[0-9a-zA-Z.,\-\<\>\=\:\;\$\+\§]$/.test(event.key) &&
+      /^[0-9a-zA-Z.,\-\<\>\=\:\;\$\+\§\#]$/.test(event.key) &&
       document.activeElement !== this.searchTag
     ) {
       event.preventDefault();
@@ -704,6 +708,17 @@ export class Main {
     } else {
       this.fuseResults = sortedMatches.slice(this.index, this.index + count);
     }
+  }
+
+  hexToRgb(hex) {
+    hex = hex.replace(/^#/, "");
+
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+
+    return r + "," + g + "," + b;
   }
 
   async setResults() {
@@ -1089,14 +1104,22 @@ export class Main {
           );
 
           setting.iconImage = true;
-          
+
           if (key == "darkMode") {
             setting.runAction = (item) => {
               this.settings[key].value = !this.settings[key].value;
               if (this.settings[key].value) {
                 document.documentElement.classList.remove("light");
+                document.documentElement.style.setProperty(
+                  "--color",
+                  "#181a24"
+                );
               } else {
                 document.documentElement.classList.add("light");
+                document.documentElement.style.setProperty(
+                  "--color",
+                  "#f2f8fc"
+                );
               }
               return "x";
             };
@@ -1107,10 +1130,34 @@ export class Main {
             };
           }
 
-
           this.results.push(setting);
         }
       }
+    }
+
+    if (this.searchType == "color") {
+      var result = "";
+
+      if (this.isValidHexCode(this.term)) {
+        result = this.hexToRgb(this.term);
+      }
+
+      var rgb = new Widget(
+        'Hexcode: <strong class="upper">' + this.term+"</strong>",
+        "RGB: "+result,
+        "palette",
+        "invert_colors",
+        "link"
+      );
+
+      rgb.iconImage = true;
+
+      if (this.isValidHexCode(this.term)) {
+        rgb.runAction = action.copyTerm(result);
+      }
+
+
+      this.results.push(rgb);
     }
 
     this.widgets.forEach((widget) => {
@@ -1277,9 +1324,9 @@ export class Main {
           }" style="${ele.iconImage ? "" : "display: none"}">${
         ele.imageURL
       }</div>
-          <div class="text"><span title="${ele.title}">${
+          <div class="text"><span>${
         ele.title
-      }</span><div class="desc" title="${ele.description}">${
+      }</span><div class="desc">${
         ele.description
       }</div></div>
           ${
@@ -1321,8 +1368,29 @@ export class Main {
     }
   }
 
+  isValidHexCode(hex) {
+    hex = hex.replace("#", "");
+
+    return /^[0-9A-Fa-f]{6}$/.test(hex);
+  }
+
   async search(reset = false, resetResults = false, setIndex = false) {
+    if (this.settings.darkMode.value) {
+      document.documentElement.style.setProperty("--color", "#181a24");
+    } else {
+      document.documentElement.style.setProperty("--color", "#f2f8fc");
+    }
+
     this.term = this.searchTag.value;
+
+    if (this.searchType == "color" && this.isValidHexCode(this.term)) {
+      document.documentElement.style.setProperty(
+        "--color",
+        "#" + this.term.replace("#", "")
+      );
+    } else if (this.searchType == "color") {
+      document.documentElement.style.setProperty("--color", this.term);
+    }
 
     if (!reset) {
       await this.setResults();

@@ -31,6 +31,14 @@ export class Action {
     return action;
   }
 
+  copyTerm(term) {
+    var action = (item) => {
+      navigator.clipboard.writeText(term);
+      return false;
+    };
+    return action;
+  }
+
   pinTab() {
     var action = (item) => {
       chrome.tabs.get(item.ID, (tab) => {
