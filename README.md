@@ -13,12 +13,12 @@ Minimum age is sadly 18
 
 Todo/Comming Soon (MAYBE):
 - [ ] Preview Video
-- [ ] Settings Page:
+- [x] Settings Page: use ":" as quick key
+- [ ] settings sync/save
 - [ ] Custom CSS
-- [ ] Custom Widgets
+- [x] Custom Widgets
 - [ ] Reponsive
 - [ ] Themes (maybe not)
-- [ ] Finish Website
+- [x] Finish Website
 - [ ] Add on Chrome Webstore / Firefox Store and maybe Edge Store
 - [ ] Todos function
-- [ ] Pin Items (maybe not)
