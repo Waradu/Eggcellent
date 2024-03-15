@@ -8,9 +8,6 @@
 2. Activate developer mode
 3. Drag and Drop Egcgellent.zip in extensions window
 
-Why not on chrome webstore?
-Minimum age is sadly 18
-
 Todo/Comming Soon (MAYBE):
 - [ ] Preview Video
 - [x] Settings Page: use ":" as quick key
