@@ -199,6 +199,8 @@ html {
             font-family: Inter;
             font-size: 18px;
             height: 100%;
+            width: max-content;
+            white-space: nowrap;
           }
 
           .input {

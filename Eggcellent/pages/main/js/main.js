@@ -105,6 +105,12 @@ export class Main {
         type: "color",
         disableFuse: true,
       },
+      {
+        key: ";",
+        text: "Search: ",
+        type: "searchin",
+        disableFuse: true,
+      },
     ];
 
     this.widgets = [];
@@ -1143,8 +1149,8 @@ export class Main {
       }
 
       var rgb = new Widget(
-        'Hexcode: <strong class="upper">' + this.term+"</strong>",
-        "RGB: "+result,
+        'Hexcode: <strong class="upper">' + this.term + "</strong>",
+        "RGB: " + result,
         "palette",
         "invert_colors",
         "link"
@@ -1156,8 +1162,61 @@ export class Main {
         rgb.runAction = action.copyTerm(result);
       }
 
-
       this.results.push(rgb);
+    }
+
+    if (this.searchType == "searchin") {
+      var searchengines = [
+        {
+          name: "google",
+          domain: "https://www.google.com",
+          search_domain: "https://www.google.com/search?q=",
+        },
+        {
+          name: "youtube",
+          domain: "https://www.youtube.com",
+          search_domain: "https://www.youtube.com/results?search_query=",
+        },
+        {
+          name: "reddit",
+          domain: "https://www.reddit.com",
+          search_domain: "https://www.reddit.com/search/?q=",
+        },
+        {
+          name: "twitter",
+          domain: "https://twitter.com",
+          search_domain: "https://twitter.com/search?q=",
+        },
+        {
+          name: "bing",
+          domain: "https://www.bing.com",
+          search_domain: "https://www.bing.com/search?q=",
+        },
+        {
+          name: "duckduckgo",
+          domain: "https://duckduckgo.com",
+          search_domain: "https://duckduckgo.com/?q=",
+        },
+      ];
+
+      var term = encodeURIComponent(this.term);
+
+      searchengines.forEach((engine) => {
+        var searchURL = engine.search_domain + term;
+        var faviconURL = `https://www.google.com/s2/favicons?domain=${engine.domain}&sz=128`;
+
+        var searchin = new Widget(
+          engine.name,
+          searchURL,
+          "searchin",
+          faviconURL,
+          "link"
+        );
+
+        searchin.runAction = action.openLink(searchURL);
+
+        this.results.push(searchin);
+      });
     }
 
     this.widgets.forEach((widget) => {
@@ -1324,9 +1383,7 @@ export class Main {
           }" style="${ele.iconImage ? "" : "display: none"}">${
         ele.imageURL
       }</div>
-          <div class="text"><span>${
-        ele.title
-      }</span><div class="desc">${
+          <div class="text"><span>${ele.title}</span><div class="desc">${
         ele.description
       }</div></div>
           ${

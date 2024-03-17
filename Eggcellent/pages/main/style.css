@@ -97,6 +97,9 @@ html body .preserve-position .search-container .search-bar .before {
   font-family: Inter;
   font-size: 18px;
   height: 100%;
+  width: -moz-max-content;
+  width: max-content;
+  white-space: nowrap;
 }
 html body .preserve-position .search-container .search-bar .input {
   width: calc(100% - 40px);
