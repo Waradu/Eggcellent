@@ -19,7 +19,7 @@
   "description": "A free search bar to manage your browser. Eggspand your productivity and eggsplore new possibilities.",
   "offline_enabled": true,
   "chrome_url_overrides": {
-    "newtab": "pages/main/newtab.html"
+    "newtab": "pages/main/index.html"
   },
   "commands": {
     "open_search_page": {
