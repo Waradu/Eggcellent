@@ -3,10 +3,10 @@ const path = require("path");
 module.exports = {
   mode: "development",
   devtool: false,
-  entry: "./script/script.ts",
+  entry: "./script.ts",
   output: {
     filename: "script.js",
-    path: path.resolve(__dirname, "../Schipiti/inject/script"),
+    path: path.resolve(__dirname, "../eggcellent/script"),
   },
   resolve: {
     extensions: [".ts", ".js"],
