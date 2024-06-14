@@ -1,2 +1,3 @@
 /.vscode
-Eggcellent/node_modules
+node_modules/
+ext/node_modules/
