@@ -10,12 +10,8 @@
 
 Todo/Comming Soon (MAYBE):
 - [ ] Preview Video
-- [x] Settings Page: use ":" as quick key
 - [ ] settings sync/save
 - [ ] Custom CSS
-- [x] Custom Widgets
-- [ ] Reponsive
-- [ ] Themes (maybe not)
-- [x] Finish Website
+- [ ] Themes
 - [ ] Add on Chrome Webstore / Firefox Store and maybe Edge Store
 - [ ] Todos function

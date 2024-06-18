@@ -23,13 +23,13 @@ export default defineBackground(() => {
         }
       });
     }
-  });
+  }); */
 
   browser.runtime.onInstalled.addListener(function (object) {
-    let internalUrl = browser.runtime.getURL("newtab.html?help=true");
+    let internalUrl = browser.runtime.getURL("/newtab.html?help=true");
 
     if (object.reason == "install") {
       browser.tabs.create({ url: internalUrl });
     }
-  }); */
+  });
 });

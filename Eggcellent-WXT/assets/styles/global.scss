@@ -1,0 +1,111 @@
+@use "sass:color";
+@use "colors";
+
+@font-face {
+  font-family: "Material Symbols Rounded";
+  font-style: normal;
+  font-weight: 100 700;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsrounded/v190/sykg-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190Fjzag.woff2)
+    format("woff2");
+}
+
+.material-symbols-rounded {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+  font-family: Maax;
+  src: url("~/assets/fonts/Maax.woff") format("woff");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("~/assets/fonts/Inter.woff2") format("woff2");
+  font-display: swap;
+}
+
+@keyframes rotate {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Inter";
+  user-select: none;
+}
+
+html {
+  --color: #181a24;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: colors.$bg;
+  color: colors.$text-color;
+  min-width: 300px;
+
+  body {
+    background-color: var(--color);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:has(.help:not(.closed)) {
+      width: calc(100% - 440px);
+    }
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+@keyframes show {
+  from {
+    scale: 0.8;
+    opacity: 0.2;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+@keyframes opacity {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.upper {
+  text-transform: uppercase;
+}
+
+*[hidden] {
+  display: none !important;
+}
